@@ -1,2 +1,3 @@
 # kart-sd
-test
+
+Lane following go kart using Pytorch & CNNs.
