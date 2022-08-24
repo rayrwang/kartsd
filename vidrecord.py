@@ -1,14 +1,27 @@
+import time
+
 import cv2 as cv
 import numpy as np
 
-cap = cv.VideoCapture(0)
-cap.set(cv.CAP_PROP_FRAME_WIDTH, 320)
-cap.set(cv.CAP_PROP_FRAME_HEIGHT, 240)
-cap.set(cv.CAP_PROP_FPS, 36)
+import hardware
 
-while True:
-    _, img = cap.read(0)
-    cv.imshow("", img)
+cap, board, angle_region, angle_read, last = hardware.init_hardware(no_pygame=True)
 
-    if cv.waitKey(1) == ord("f"):
-        break
+start = time.perf_counter()
+with open("train.csv", "a") as file:
+    while time.perf_counter() - start < 10:
+        _, img = cap.read(0)
+        cv.imshow("", img)
+
+        if cv.waitKey(1) == ord("f"):
+            cv.destroyAllWindows() 
+            cv.VideoCapture(0).release()
+            break
+
+        angle_region, angle_read, last, degree = hardware.update_angle(board, angle_region, angle_read, last)
+
+        flat = img.reshape(36864)
+        full = np.insert(flat, 0, degree)
+
+        np.savetxt(file, [full], fmt="%.0f", delimiter=",", newline="")
+        file.write("\n")
