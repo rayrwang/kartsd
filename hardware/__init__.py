@@ -10,7 +10,7 @@ def init_hardware(no_pygame=False):
     cap = cv.VideoCapture(0)
     cap.set(cv.CAP_PROP_FRAME_WIDTH, 128)
     cap.set(cv.CAP_PROP_FRAME_HEIGHT, 96)
-    cap.set(cv.CAP_PROP_FPS, 36)
+    cap.set(cv.CAP_PROP_FPS, 30)
 
     # Init arduino
     board = pf.Arduino('/dev/ttyACM0')
