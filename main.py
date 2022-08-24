@@ -1,3 +1,7 @@
+"""
+Main file for inference and control
+"""
+
 import time
 import math
 import sys

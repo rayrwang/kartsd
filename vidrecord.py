@@ -1,3 +1,7 @@
+"""
+Record video to train.csv
+"""
+
 import time
 
 import cv2 as cv
