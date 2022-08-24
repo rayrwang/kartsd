@@ -9,13 +9,24 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-import hardware
+from . import hardware
 
 
 class Network(nn.Module):
     def __init__(self):
         super().__init__()
-        
+
+
+def turn(deg):
+    """turn steering by deg degrees (+ = ccw)"""
+    if deg > 0:
+        board.digital[4].write(1)
+    elif deg < 0:
+        board.digital[4].write(0)
+
+    for i in range(round(deg * 7 * 800 / 360)):
+        board.digital[2].write(0)
+        board.digital[2].write(1)
 
 # Init pygame display
 window = pg.display.set_mode((0, 0))
