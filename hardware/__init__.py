@@ -17,8 +17,8 @@ def init_hardware():
 
     # Init camera
     cap = cv.VideoCapture(0)
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, 224)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 224)
+    cap.set(cv.CAP_PROP_FRAME_WIDTH, 128)
+    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 96)
     cap.set(cv.CAP_PROP_FPS, 36)
 
     # Angle input data 0.04 to 0.96, 0.5=center
