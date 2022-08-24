@@ -5,7 +5,28 @@ import pygame as pg
 import cv2 as cv
 
 
-def init_hardware():
+def init_hardware(no_pygame=False):
+    # Init camera
+    cap = cv.VideoCapture(0)
+    cap.set(cv.CAP_PROP_FRAME_WIDTH, 128)
+    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 96)
+    cap.set(cv.CAP_PROP_FPS, 36)
+
+    # Init arduino
+    board = pf.Arduino('/dev/ttyACM0')
+    it = pf.util.Iterator(board)
+    it.start()
+    board.analog[0].enable_reporting()
+
+    # Angle input data 0.04 to 0.96, 0.5=center
+    # Angle region handles data crossing boundary (e.g. 0.96 to 0.04)
+    angle_region = 1
+    angle_read = 0.5
+    last = 0.5
+
+    if no_pygame:
+        return cap, board, angle_region, angle_read, last
+
     # Init pygame display
     window = pg.display.set_mode((0, 0))
     pg.init()
@@ -15,30 +36,12 @@ def init_hardware():
     update = pg.USEREVENT + 1
     pg.time.set_timer(update, 200)
 
-    # Init camera
-    cap = cv.VideoCapture(0)
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, 128)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 96)
-    cap.set(cv.CAP_PROP_FPS, 36)
-
-    # Angle input data 0.04 to 0.96, 0.5=center
-    # Angle region handles data crossing boundary (e.g. 0.96 to 0.04)
-    angle_region = 1
-    angle_read = 0.5
-    last = 0.5
-
     # Init fonts
     font0 = pg.font.Font("Helvetica.ttf", 100)
     font1 = pg.font.Font("Helvetica.ttf", 75)
     font2 = pg.font.Font("Helvetica.ttf", 25)
 
-    # Init arduino
-    board = pf.Arduino('/dev/ttyACM0')
-    it = pf.util.Iterator(board)
-    it.start()
-    board.analog[0].enable_reporting()
-
-    return window, update, cap, angle_region, angle_read, last, font0, font1, font2, board
+    return cap, board, angle_region, angle_read, last, window, font0, font1, font2, update
 
 
 def update_angle(board, angle_region, angle_read, last):
@@ -51,10 +54,19 @@ def update_angle(board, angle_region, angle_read, last):
     if angle_read < 0.15 and last > 0.85:
         angle_region += 1
 
-    return angle_region, angle_read, last
+    if angle_region == 0:
+        degree = -1 / 7 * (0.04 - (0.96 - angle_read) - 0.5) * 360 / 0.92
+    elif angle_region == 1:
+        degree = -1 / 7 * (angle_read - 0.5) * 360 / 0.92
+    elif angle_region == 2:
+        degree = -1 / 7 * (0.96 + (angle_read - 0.04) - 0.5) * 360 / 0.92
+    else:
+        raise Exception("Angle reading malfunction")
+
+    return angle_region, angle_read, last, degree
 
 
-def update_display(window, font0, font1, font2, angle_region, angle_read):
+def update_display(window, font0, font1, font2, angle_region, angle_read, degree):
     # Display update
     window.fill((255, 255, 255))
 
@@ -69,13 +81,6 @@ def update_display(window, font0, font1, font2, angle_region, angle_read):
         degree_txt = font0.render("Error", False, (0, 0, 0))
         dir_txt = font1.render("Error", False, (0, 0, 0))
     else:
-        if angle_region == 0:
-            degree = -1 / 7 * (0.04 - (0.96 - angle_read) - 0.5) * 360 / 0.92
-        elif angle_region == 1:
-            degree = -1 / 7 * (angle_read - 0.5) * 360 / 0.92
-        elif angle_region == 2:
-            degree = -1 / 7 * (0.96 + (angle_read - 0.04) - 0.5) * 360 / 0.92
-
         degree_txt = font0.render(f"{math.fabs(degree) : .2f}", False, (0, 0, 0))
 
         # Possible steering angles (physical constraint)
