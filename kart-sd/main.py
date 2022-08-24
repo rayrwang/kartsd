@@ -2,8 +2,6 @@ import pyfirmata as pf
 import time
 import pygame as pg
 import cv2 as cv
-from picamera import PiCamera
-from picamera.array import PiRGBArray
 import math
 import sys
 
@@ -48,16 +46,13 @@ font2 = pg.font.Font("Helvetica.ttf", 25)
 angle_read = 0.5
 last = 0.5
 
-camera = PiCamera()
-camera.resolution = (320, 240)
-camera.framerate = 30
-rawCapture = PiRGBArray(camera, size=(320, 240))
-time.sleep(0.1)
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    image = frame.array
-
-    cv.imshow("", image)
-    rawCapture.truncate(0)
+cap = cv.VideoCapture(0)
+cap.set(cv.CAP_PROP_FRAME_WIDTH, 224)
+cap.set(cv.CAP_PROP_FRAME_HEIGHT, 224)
+cap.set(cv.CAP_PROP_FPS, 36)
+while True:
+    _, img = cap.read(0)
+    cv.imshow("", img)
 
     if cv.waitKey(1) == ord("f"):
         break
