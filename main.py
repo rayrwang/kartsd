@@ -9,7 +9,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from . import hardware
+import hardware
 
 
 class Network(nn.Module):
@@ -17,31 +17,7 @@ class Network(nn.Module):
         super().__init__()
 
 
-def turn(deg):
-    """turn steering by deg degrees (+ = ccw)"""
-    if deg > 0:
-        board.digital[4].write(1)
-    elif deg < 0:
-        board.digital[4].write(0)
-
-    for i in range(round(deg * 7 * 800 / 360)):
-        board.digital[2].write(0)
-        board.digital[2].write(1)
-
-# Init pygame display
-window = pg.display.set_mode((0, 0))
-pg.init()
-
-clock = pg.time.Clock()
-
-update = pg.USEREVENT + 1
-pg.time.set_timer(update, 200)
-
-# Init camera
-cap = cv.VideoCapture(0)
-cap.set(cv.CAP_PROP_FRAME_WIDTH, 224)
-cap.set(cv.CAP_PROP_FRAME_HEIGHT, 224)
-cap.set(cv.CAP_PROP_FPS, 36)
+window, update, cap, angle_region, angle_read, last, font0, font1, font2, board = hardware.init_hardware()
 while True:
     _, img = cap.read(0)
     cv.imshow("", img)
@@ -49,10 +25,10 @@ while True:
     if cv.waitKey(1) == ord("f"):
         break
 
-    hardware.update_angle()
+    angle_region, angle_read, last = hardware.update_angle(board, angle_region, angle_read, last)
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
             sys.exit()
         if event.type == update:
-            hardware.display_update()
+            hardware.update_display(window, font0, font1, font2, angle_region, angle_read)

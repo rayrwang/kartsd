@@ -1,26 +1,47 @@
 import math
+
 import pyfirmata as pf
+import pygame as pg
+import cv2 as cv
 
 
-# Angle input data 0.04 to 0.96, 0.5=center
-# Angle region handles data crossing boundary (e.g. 0.96 to 0.04)
-angle_region = 1
-angle_read = 0.5
-last = 0.5
+def init_hardware():
+    # Init pygame display
+    window = pg.display.set_mode((0, 0))
+    pg.init()
 
-# Init fonts
-font0 = pg.font.Font("Helvetica.ttf", 100)
-font1 = pg.font.Font("Helvetica.ttf", 75)
-font2 = pg.font.Font("Helvetica.ttf", 25)
+    clock = pg.time.Clock()
 
-# Init arduino
-board = pf.Arduino('/dev/ttyACM0')
-it = pf.util.Iterator(board)
-it.start()
-board.analog[0].enable_reporting()
+    update = pg.USEREVENT + 1
+    pg.time.set_timer(update, 200)
+
+    # Init camera
+    cap = cv.VideoCapture(0)
+    cap.set(cv.CAP_PROP_FRAME_WIDTH, 224)
+    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 224)
+    cap.set(cv.CAP_PROP_FPS, 36)
+
+    # Angle input data 0.04 to 0.96, 0.5=center
+    # Angle region handles data crossing boundary (e.g. 0.96 to 0.04)
+    angle_region = 1
+    angle_read = 0.5
+    last = 0.5
+
+    # Init fonts
+    font0 = pg.font.Font("Helvetica.ttf", 100)
+    font1 = pg.font.Font("Helvetica.ttf", 75)
+    font2 = pg.font.Font("Helvetica.ttf", 25)
+
+    # Init arduino
+    board = pf.Arduino('/dev/ttyACM0')
+    it = pf.util.Iterator(board)
+    it.start()
+    board.analog[0].enable_reporting()
+
+    return window, update, cap, angle_region, angle_read, last, font0, font1, font2, board
 
 
-def update_angle():
+def update_angle(board, angle_region, angle_read, last):
     last = angle_read
     angle_read = board.analog[0].read()
 
@@ -30,8 +51,10 @@ def update_angle():
     if angle_read < 0.15 and last > 0.85:
         angle_region += 1
 
+    return angle_region, angle_read, last
 
-def update_display():
+
+def update_display(window, font0, font1, font2, angle_region, angle_read):
     # Display update
     window.fill((255, 255, 255))
 
@@ -76,7 +99,7 @@ def update_display():
     pg.display.update()
 
 
-def turn(deg):
+def turn(board, deg):
     """turn steering by deg degrees (+ = ccw)"""
     if deg > 0:
         board.digital[4].write(1)
