@@ -25,7 +25,7 @@ with open("train.csv", "a") as file:
         angle_region, angle_read, last, degree = hardware.update_angle(board, angle_region, angle_read, last)
 
         flat = img.reshape(36864)
-        flat = flat.astype("int8")
+        flat = flat.astype("int16")
         full = np.insert(flat, 0, degree)
 
         np.savetxt(file, [full], fmt="%.0f", delimiter=",", newline="")
