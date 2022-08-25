@@ -5,7 +5,7 @@ import pygame as pg
 import cv2 as cv
 
 
-def init_hardware(no_pygame=False):
+def init_hardware(update_msec):
     # Init camera
     cap = cv.VideoCapture(0)
     cap.set(cv.CAP_PROP_FRAME_WIDTH, 128)
@@ -24,9 +24,6 @@ def init_hardware(no_pygame=False):
     angle_read = 0.5
     last = 0.5
 
-    if no_pygame:
-        return cap, board, angle_region, angle_read, last
-
     # Init pygame display
     window = pg.display.set_mode((0, 0))
     pg.init()
@@ -34,7 +31,7 @@ def init_hardware(no_pygame=False):
     clock = pg.time.Clock()
 
     update = pg.USEREVENT + 1
-    pg.time.set_timer(update, 200)
+    pg.time.set_timer(update, update_msec)
 
     # Init fonts
     font0 = pg.font.Font("Helvetica.ttf", 100)

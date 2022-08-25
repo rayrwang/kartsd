@@ -3,17 +3,19 @@ Record video to train.csv
 """
 
 import time
+import math
 
 import cv2 as cv
 import numpy as np
+import pygame as pg
 
 import hardware
 
-cap, board, angle_region, angle_read, last = hardware.init_hardware(no_pygame=True)
+cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=1000)
 
 start = time.perf_counter()
 with open("train.csv", "a") as file:
-    while time.perf_counter() - start < 10:
+    while True:
         _, img = cap.read(0)
         cv.imshow("", img)
 
@@ -30,3 +32,7 @@ with open("train.csv", "a") as file:
 
         np.savetxt(file, [full], fmt="%.0f", delimiter=",", newline="")
         file.write("\n")
+
+        for event in pg.event.get():
+            if event.type == update:
+                hardware.update_display(window, font0, font1, font2, angle_region, angle_read, degree)

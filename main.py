@@ -2,9 +2,7 @@
 Main file for inference and control
 """
 
-import time
 import math
-import sys
 
 import pyfirmata as pf
 import pygame as pg
@@ -21,18 +19,18 @@ class Network(nn.Module):
         super().__init__()
 
 
-cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware()
+cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=200)
 while True:
     _, img = cap.read(0)
     cv.imshow("", img)
 
     if cv.waitKey(1) == ord("f"):
+        cv.destroyAllWindows() 
+        cv.VideoCapture(0).release()
         break
 
     angle_region, angle_read, last, degree = hardware.update_angle(board, angle_region, angle_read, last)
 
     for event in pg.event.get():
-        if event.type == pg.QUIT:
-            sys.exit()
         if event.type == update:
             hardware.update_display(window, font0, font1, font2, angle_region, angle_read, degree)
