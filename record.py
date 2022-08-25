@@ -2,7 +2,6 @@
 Record video to train.csv
 """
 
-import time
 import math
 
 import cv2 as cv
@@ -13,7 +12,6 @@ import hardware
 
 cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=1000)
 
-start = time.perf_counter()
 with open("train.csv", "a") as file:
     while True:
         _, img = cap.read(0)
