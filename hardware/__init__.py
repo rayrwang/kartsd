@@ -57,8 +57,6 @@ def update_angle(board, angle_region, angle_read, last):
         degree = -1 / 7 * (angle_read - 0.5) * 360 / 0.92
     elif angle_region == 2:
         degree = -1 / 7 * (0.96 + (angle_read - 0.04) - 0.5) * 360 / 0.92
-    else:
-        raise Exception("Angle reading malfunction")
 
     return angle_region, angle_read, last, degree
 
