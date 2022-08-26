@@ -52,11 +52,11 @@ def update_angle(board, angle_region, angle_read, last):
         angle_region += 1
 
     if angle_region == 0:
-        degree = -1 / 7 * (0.04 - (0.96 - angle_read) - 0.5) * 360 / 0.92
+        degree = -1 / 7 * (0.04 - (0.96 - angle_read) - 0.9) * 360 / 0.92
     elif angle_region == 1:
-        degree = -1 / 7 * (angle_read - 0.5) * 360 / 0.92
+        degree = -1 / 7 * (angle_read - 0.9) * 360 / 0.92
     elif angle_region == 2:
-        degree = -1 / 7 * (0.96 + (angle_read - 0.04) - 0.5) * 360 / 0.92
+        degree = -1 / 7 * (0.96 + (angle_read - 0.04) - 0.9) * 360 / 0.92
 
     return angle_region, angle_read, last, degree
 
