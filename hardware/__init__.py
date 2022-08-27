@@ -46,9 +46,9 @@ def update_angle(board, angle_region, angle_read, last):
     angle_read = board.analog[0].read()
 
     # Handle crossing angle region boundary
-    if angle_read > 0.85 and last < 0.15:
+    if angle_read > 0.80 and last < 0.20:
         angle_region -= 1
-    if angle_read < 0.15 and last > 0.85:
+    if angle_read < 0.20 and last > 0.80:
         angle_region += 1
 
     if angle_region == 0:
@@ -71,21 +71,12 @@ def update_display(window, font0, font1, font2, angle_region, angle_read, degree
     angle_read_txt = font2.render(f"{angle_read}", False, (0, 0, 0))
     window.blit(angle_read_txt, (0, 50))
 
-    # Steering only has enough room for these 3 angle regions
-    if not 0 <= angle_region <= 2:
-        degree_txt = font0.render("Error", False, (0, 0, 0))
-        dir_txt = font1.render("Error", False, (0, 0, 0))
-    else:
-        degree_txt = font0.render(f"{math.fabs(degree) : .2f}", False, (0, 0, 0))
+    degree_txt = font0.render(f"{math.fabs(degree) : .2f}", False, (0, 0, 0))
 
-        # Possible steering angles (physical constraint)
-        if not -35 < degree < 50:
-            degree_txt = font0.render("Error", False, (0, 0, 0))
-            dir_txt = font1.render("Error", False, (0, 0, 0))
-        elif degree > 0:
-            dir_txt = font1.render("Left", False, (0, 0, 0))
-        elif degree <= 0:
-            dir_txt = font1.render("Right", False, (0, 0, 0))
+    if degree > 0:
+        dir_txt = font1.render("Left", False, (0, 0, 0))
+    elif degree <= 0:
+        dir_txt = font1.render("Right", False, (0, 0, 0))
 
     # Display text
     degree_rect = degree_txt.get_rect()
