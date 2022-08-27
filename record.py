@@ -12,7 +12,6 @@ import hardware
 
 cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=500)
 
-start = time.perf_counter()
 with open("train.csv", "a") as file:
     while True:
         if cv.waitKey(1) == ord("f"):
