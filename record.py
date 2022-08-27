@@ -3,7 +3,6 @@ Record video to train.csv
 """
 
 import math
-import time
 
 import cv2 as cv
 import numpy as np
@@ -11,11 +10,11 @@ import pygame as pg
 
 import hardware
 
-cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=200)
+cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=500)
 
 start = time.perf_counter()
 with open("train.csv", "a") as file:
-    while time.perf_counter() - start < 10:
+    while True:
         if cv.waitKey(1) == ord("f"):
             cv.destroyAllWindows() 
             cv.VideoCapture(0).release()
