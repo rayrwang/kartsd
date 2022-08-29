@@ -13,12 +13,6 @@ import torch.nn as nn
 
 import hardware
 
-
-class Network(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-
 cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=200)
 while True:
     _, img = cap.read(0)
