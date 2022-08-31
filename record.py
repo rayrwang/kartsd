@@ -2,9 +2,7 @@
 Record video to train.csv
 """
 
-import math
-
-import cv2 as cv
+import cv2
 import numpy as np
 import pygame as pg
 
@@ -14,9 +12,9 @@ cap, board, angle_region, angle_read, last, window, font0, font1, font2, update 
 
 with open("train.csv", "a") as file:
     while True:
-        if cv.waitKey(1) == ord("f"):
-            cv.destroyAllWindows() 
-            cv.VideoCapture(0).release()
+        if cv2.waitKey(1) == ord("f"):
+            cv2.destroyAllWindows()
+            cv2.VideoCapture(0).release()
             break
 
         angle_region, angle_read, last, degree = hardware.update_angle(board, angle_region, angle_read, last)
@@ -25,7 +23,7 @@ with open("train.csv", "a") as file:
             if event.type == update:
                 # Update display and record frame at same time
                 _, img = cap.read(0)
-                cv.imshow("", img)
+                cv2.imshow("", img)
 
                 flat = img.reshape(36864)
                 flat = flat.astype("int16")

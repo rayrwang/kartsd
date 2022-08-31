@@ -1,5 +1,5 @@
 import numpy as np
-import cv2 as cv
+import cv2
 import pygame as pg
 
 window = pg.display.set_mode((100, 100))
@@ -13,9 +13,9 @@ vid_arr = vid_arr.astype("uint8")
 prev_img_num = -1
 img_num = 0
 while True:
-    if cv.waitKey(1) == ord("f"):
-        cv.destroyAllWindows() 
-        cv.VideoCapture(0).release()
+    if cv2.waitKey(1) == ord("f"):
+        cv2.destroyAllWindows()
+        cv2.VideoCapture(0).release()
         break
 
     for event in pg.event.get():
@@ -30,7 +30,7 @@ while True:
         img = vid_arr[img_num]
         img = img.reshape(96, 128, 3)
 
-        cv.imshow("", img)
+        cv2.imshow("", img)
         print(steer, img_num)
 
         prev_img_num = img_num
