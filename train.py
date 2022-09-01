@@ -10,9 +10,9 @@ class TrainingData(Dataset):
     def __init__(self):
         data = np.loadtxt("train.csv", dtype="float32", delimiter=",")
         self.x = torch.from_numpy(data[:, 1:])
-        self.x = np.reshape(self.x, (-1, 96, 128, 3))
-        self.x = np.swapaxes(self.x, 1, 3)
-        self.x = np.swapaxes(self.x, 2, 3)
+        self.x = torch.reshape(self.x, (-1, 96, 128, 3))
+        self.x = torch.swapaxes(self.x, 1, 3)
+        self.x = torch.swapaxes(self.x, 2, 3)
         self.y = torch.from_numpy(data[:, [0]])
         self.n_samples = data.shape[0]
 
@@ -76,4 +76,4 @@ with torch.no_grad():
         loss = criterion(outputs, labels)
         print(loss)
 
-# torch.save(model.state_dict(), "model.pth")
+torch.save(model.state_dict(), "model.pth")
