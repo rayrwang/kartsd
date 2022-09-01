@@ -17,7 +17,7 @@ class Network(nn.Module):
     def forward(self, x):
         x = self.pool(f.relu(self.conv1(x)))
         x = self.pool(f.relu(self.conv2(x)))
-        x = x.view(-1, 350)
+        x = x.reshape(-1, 350)
         x = f.relu(self.fc1(x))
         x = f.relu(self.fc2(x))
         x = self.fc3(x)

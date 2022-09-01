@@ -7,13 +7,13 @@ import pygame as pg
 window = pg.display.set_mode((100, 100))
 pg.init()
 
-vid_arr = np.loadtxt("train.csv", dtype="int16", delimiter=",")
+vid_arr = np.loadtxt("train.csv", dtype="float16", delimiter=",")
 steer_arr = vid_arr[:, 0]
 vid_arr = np.delete(vid_arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
 
 prev_img_num = -1
-img_num = 0
+img_num = 2000
 
 while True:
     if img_num != prev_img_num:
