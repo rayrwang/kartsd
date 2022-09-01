@@ -27,6 +27,7 @@ device = torch.device("cuda")
 num_epochs = 10
 batch_size = 100
 
+# import torch.nn.functional as f
 # conv1 = nn.Conv2d(3, 5, 5, stride=2)
 # pool = torch.nn.MaxPool2d(2, 2)
 # conv2 = nn.Conv2d(5, 10, 5, stride=2)
@@ -34,8 +35,7 @@ batch_size = 100
 # images, _ = dataset[0]
 # images = images.view(-1, 96, 128, 3)
 # images = torch.swapaxes(images, 1, 3)
-# images = torch.swapaxes(images, 2, 3)
-#
+
 # x = pool(f.relu(conv1(images)))
 # x = pool(f.relu(conv2(x)))
 # print(x.shape)
