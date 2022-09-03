@@ -13,7 +13,7 @@ vid_arr = np.delete(vid_arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
 
 prev_img_num = -1
-img_num = 2000
+img_num = 0
 
 while True:
     if img_num != prev_img_num:
