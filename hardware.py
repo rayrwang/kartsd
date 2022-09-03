@@ -1,4 +1,5 @@
 import math
+import time
 
 import pyfirmata as pf
 import pygame as pg
@@ -61,7 +62,7 @@ def update_angle(board, angle_region, angle_read, last):
     return angle_region, angle_read, last, degree
 
 
-def update_display(window, font0, font1, font2, angle_region, angle_read, degree):
+def update_display(window, font0, font1, font2, angle_region, angle_read, degree, pred):
     # Display update
     window.fill((255, 255, 255))
 
@@ -70,6 +71,9 @@ def update_display(window, font0, font1, font2, angle_region, angle_read, degree
 
     angle_read_txt = font2.render(f"{angle_read}", False, (0, 0, 0))
     window.blit(angle_read_txt, (0, 50))
+
+    pred_txt = font2.render(f"{pred : .4f}", False, (0, 0, 0))
+    window.blit(pred_txt, (0, 100))
 
     degree_txt = font0.render(f"{math.fabs(degree) : .2f}", False, (0, 0, 0))
 
@@ -90,13 +94,13 @@ def update_display(window, font0, font1, font2, angle_region, angle_read, degree
     pg.display.update()
 
 
-def turn(board, deg):
-    """turn steering by deg degrees (+ = ccw)"""
-    if deg > 0:
+def turn(board, direction):
+    """turn steering ccw (dir=True), cw"""
+    if direction:
         board.digital[4].write(1)
-    elif deg < 0:
+    elif not direction:
         board.digital[4].write(0)
 
-    for i in range(round(deg * 7 * 800 / 360)):
+    for i in range(10):
         board.digital[2].write(0)
         board.digital[2].write(1)
