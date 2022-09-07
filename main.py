@@ -2,6 +2,8 @@
 Main file for inference and control
 """
 
+import threading
+
 import pygame as pg
 import cv2
 import torch
@@ -15,7 +17,8 @@ model.load_state_dict(torch.load("model.pth", map_location=device))
 model.eval()
 
 cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=200)
-cal = 14
+center = 11
+gain = 1
 while True:
     _, img = cap.read(0)
     cv2.imshow("", img)
@@ -30,14 +33,13 @@ while True:
     x = torch.swapaxes(x, 1, 3)
     x = torch.swapaxes(x, 2, 3)
     x = x.to(device)
-    yhat = model(x).item() - cal
-
+    yhat = gain*(model(x).item() - center)
     angle_region, angle_read, last, degree = hardware.update_angle(board, angle_region, angle_read, last)
 
-    direction = True if yhat > degree else False
+    turn_thread = threading.Thread(target=hardware.turn, args=(board, yhat-degree))
     # Safeguard
-    if -20 < degree < 20:
-        hardware.turn(board, direction)
+    if -30 < degree < 30:
+        turn_thread.start()
 
     for event in pg.event.get():
         if event.type == update:

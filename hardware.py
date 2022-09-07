@@ -94,13 +94,14 @@ def update_display(window, font0, font1, font2, angle_region, angle_read, degree
     pg.display.update()
 
 
-def turn(board, direction):
+def turn(board, deg):
     """turn steering ccw (dir=True), cw"""
-    if direction:
+    if deg > 0:
         board.digital[4].write(1)
-    elif not direction:
+    else:
         board.digital[4].write(0)
 
-    for i in range(10):
+    kp = 4
+    for i in range(min(40, round(math.fabs(deg*kp)))):
         board.digital[2].write(0)
         board.digital[2].write(1)
