@@ -8,13 +8,39 @@ from network import Network
 
 class TrainingData(Dataset):
     def __init__(self):
-        data = np.loadtxt("train.csv", dtype="float32", delimiter=",")
-        self.x = torch.from_numpy(data[:, 1:])
+        # data = np.loadtxt("center.csv", dtype="float32", delimiter=",")
+        # self.x = torch.from_numpy(data[:, 1:])
+        # self.x = torch.reshape(self.x, (-1, 96, 128, 3))
+        # self.x = torch.swapaxes(self.x, 1, 3)
+        # self.x = torch.swapaxes(self.x, 2, 3)
+        # self.y = torch.from_numpy(data[:, [0]])
+        #
+        # self.n_samples = data.shape[0]
+
+        left_np = np.loadtxt("left.csv", dtype="float32", delimiter=",")
+        center_np = np.loadtxt("center.csv", dtype="float32", delimiter=",")
+        right_np = np.loadtxt("right.csv", dtype="float32", delimiter=",")
+
+        left = torch.from_numpy(left_np[:, 1:])
+        center = torch.from_numpy(center_np[:, 1:])
+        right = torch.from_numpy(right_np[:, 1:])
+
+        self.x = torch.cat((left, center, right))
+
         self.x = torch.reshape(self.x, (-1, 96, 128, 3))
         self.x = torch.swapaxes(self.x, 1, 3)
         self.x = torch.swapaxes(self.x, 2, 3)
-        self.y = torch.from_numpy(data[:, [0]])
-        self.n_samples = data.shape[0]
+
+        left = torch.from_numpy(left_np[:, [0]])
+        center = torch.from_numpy(center_np[:, [0]])
+        right = torch.from_numpy(right_np[:, [0]])
+
+        left = torch.full(left.shape, -3.5)
+        right = torch.full(right.shape, 0.5)
+
+        self.y = torch.cat((left, center, right))
+
+        self.n_samples = self.x.shape[0]
 
     def __getitem__(self, index):
         return self.x[index], self.y[index]
@@ -31,7 +57,6 @@ train_dataloader = DataLoader(dataset=train_dataset, batch_size=100, shuffle=Tru
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=len(test_dataset))
 
 device = torch.device("cuda")
-num_epochs = 10
 batch_size = 100
 
 # import torch.nn.functional as f
@@ -64,7 +89,7 @@ for epoch in range(100):
         loss.backward()
         optimizer.step()
 
-        print(f"Epoch {epoch}, Step {step}, Loss: {loss.item() : .4f}")
+        print(f"Epoch {epoch}, Step {step}, Loss:{loss.item() : .4f}")
 
 # Test
 with torch.no_grad():
@@ -76,4 +101,4 @@ with torch.no_grad():
         loss = criterion(outputs, labels)
         print(loss)
 
-torch.save(model.state_dict(), "model.pth")
+torch.save(model.state_dict(), "light4_sides.pth")
