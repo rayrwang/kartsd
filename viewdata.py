@@ -5,11 +5,25 @@ import numpy as np
 import cv2
 import pygame as pg
 
-window = pg.display.set_mode((820, 830))
+
+def project(*args):
+    for point in args:
+        att = math.pi / 180 * 0.38 * (point[1] + 13)  # + difference between horizon and index at top of image
+        azi = math.pi / 180 * 0.38 * (point[0] - 64)  # - half of image width
+        dist = 0.7 / math.tan(att)  # dist : distance on ground from camera to px location
+        x = dist * math.sin(azi)
+        y = dist * math.cos(azi)
+
+        vs_x = round((x + 5.0625) / 0.125)  # Adjust x to move 0 from center to left
+        vs_y = round((y - 0.0625) / 0.125)  # Pull y half a vs block down
+        vs[vs_y, vs_x] = 1
+
+
+window = pg.display.set_mode((810, 810))
 pg.init()
 
 # Load data
-vid_arr = np.loadtxt("Center.csv", dtype="float16", delimiter=",")
+vid_arr = np.loadtxt("Right.csv", dtype="float16", delimiter=",")
 steer_arr = vid_arr[:, 0]
 vid_arr = np.delete(vid_arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
@@ -40,30 +54,24 @@ while True:
         print(steer, img_num)
 
         # Compute physical x and y for pixels in edges
-        vs = np.zeros((72, 82))
+        vs = np.zeros((70, 81))  # rows, columns
+        vs[69, 40] = 1
 
         for px_y, row in enumerate(edges_img[30:]):  # px_y : pixels below horizon
             for px_x, pos in enumerate(row):  # px_x : pixels from left (48 to center)
                 if pos == 255:
-                    att = math.pi/180 * 0.48*(px_y + 10)
-                    azi = math.pi/180 * 0.48*(px_x - 64)
-                    dist = 0.7 / math.tan(att)  # dist : distance on ground from camera to px location
-                    x = dist * math.sin(azi)
-                    y = dist * math.cos(azi)
-
-                    vs_x = round((x + 5.125) / 0.125)  # Adjust x to move 0 from center to left
-                    vs_y = round((y - 0.125) / 0.125)  # Pull y half a vs block down
-                    vs[vs_y, vs_x] = 1
+                    project((px_x, px_y), (px_x, px_y + 0.2), (px_x, px_y - 0.2),
+                            (px_x, px_y + 0.4), (px_x, px_y - 0.4))
 
         # Display vs
         window.fill((255, 255, 255))
-        window.blit(car, (375, 720))
+        window.blit(car, (370, 700))
         for n_y, y_row in enumerate(vs):
             for n_x, x in enumerate(y_row):
                 if x == 1:
                     rect = pg.Surface((10, 10))
                     pg.draw.rect(rect, (0, 0, 0), (0, 0, 10, 10))
-                    window.blit(rect, (10*n_x, 720-(10*n_y)))
+                    window.blit(rect, (10*n_x, 690-(10*n_y)))
         pg.display.update()
 
         prev_img_num = img_num
