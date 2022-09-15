@@ -6,10 +6,10 @@ import cv2
 import pygame as pg
 
 
-def project(*args):
-    for point in args:
+def project(*points):
+    for point in points:
         att = math.pi / 180 * 0.38 * (point[1] + 13)  # + difference between horizon and index at top of image
-        azi = math.pi / 180 * 0.38 * (point[0] - 64)  # - half of image width
+        azi = math.pi / 180 * 0.38 * (point[0] - 63.5)  # - index at center of image
         dist = 0.7 / math.tan(att)  # dist : distance on ground from camera to px location
         x = dist * math.sin(azi)
         y = dist * math.cos(azi)
