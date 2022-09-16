@@ -9,13 +9,13 @@ window = pg.display.set_mode((810, 810))
 pg.init()
 
 # Load data
-arr = np.loadtxt("vs_train_rough.csv", delimiter=",")
+arr = np.loadtxt("vs_train.csv", delimiter=",")
 vid_arr = arr[:, :36864]
 vid_arr = vid_arr.astype("uint8")
 vs_arr = arr[:, 36864:]
 
 # Init video and vs displays
-img_num = 0
+img_num = 2289
 
 cv2.namedWindow("a", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("a", 512, 384)
@@ -53,7 +53,7 @@ while True:
         cv2.VideoCapture(0).release()
         break
 
-    time.sleep(0.1)
+    # time.sleep(0.1)
     keys = pg.key.get_pressed()
     if keys[pg.K_w]:
         vid_arr = np.delete(vid_arr, img_num, 0)
@@ -63,8 +63,8 @@ while True:
     if keys[pg.K_d]:
         img_num += 1
 
-with open("vs_train_clean.csv", "a") as file:
-    vid_arr = vid_arr.reshape(-1, 36864)
-    vs_arr = vs_arr.reshape(-1, 5670)
-    full = np.concatenate((vid_arr, vs_arr), axis=1)
-    np.savetxt(file, full, fmt="%.0f", delimiter=",")
+# with open("vs_train_clean.csv", "a") as file:
+#     vid_arr = vid_arr.reshape(-1, 36864)
+#     vs_arr = vs_arr.reshape(-1, 5670)
+#     full = np.concatenate((vid_arr, vs_arr), axis=1)
+#     np.savetxt(file, full, fmt="%.0f", delimiter=",")
