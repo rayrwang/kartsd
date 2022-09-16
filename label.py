@@ -23,7 +23,7 @@ window = pg.display.set_mode((810, 810))
 pg.init()
 
 # Load data
-vid_arr = np.loadtxt("train2.csv", dtype="float16", delimiter=",")
+vid_arr = np.loadtxt("right.csv", dtype="float16", delimiter=",")
 steer_arr = vid_arr[:, 0]
 vid_arr = np.delete(vid_arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
@@ -31,9 +31,15 @@ vid_arr = vid_arr.astype("uint8")
 # Init video and vs displays
 prev_img_num = -1
 
-# train1 1186 - evens
-# train 2 990 - evens
-img_num = 296
+# Labeling progress
+# train1 1678 - evens
+# train2 990 - evens
+# center 1000 - all
+# left 300 - all
+# right 300 - all
+
+img_num = 126
+lower, upper = 50, 150
 
 cv2.namedWindow("a", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("a", 512, 384)
@@ -45,7 +51,7 @@ car = pg.Surface((70, 110))
 pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
 
 vs = np.zeros((70, 81))
-with open("vs_train.csv", "a") as file:
+with open("vs_train_rough.csv", "a") as file:
     while True:
         save = False
 
@@ -89,7 +95,7 @@ with open("vs_train.csv", "a") as file:
             img = img.reshape(96, 128, 3)
             cv2.imshow("a", img)
 
-            edges_img = cv2.Canny(img, 150, 250, apertureSize=3)
+            edges_img = cv2.Canny(img, lower, upper, apertureSize=3)
 
             edges_img[:29] = 0
             cv2.imshow("b", edges_img)
