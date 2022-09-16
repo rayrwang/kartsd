@@ -3,15 +3,15 @@ import time
 
 import pyfirmata as pf
 import pygame as pg
-import cv2 as cv
+import cv2
 
 
 def init_hardware(update_msec):
     # Init camera
-    cap = cv.VideoCapture(0)
-    cap.set(cv.CAP_PROP_FRAME_WIDTH, 128)
-    cap.set(cv.CAP_PROP_FRAME_HEIGHT, 96)
-    cap.set(cv.CAP_PROP_FPS, 30)
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
+    cap.set(cv2.CAP_PROP_FPS, 30)
 
     # Init arduino
     board = pf.Arduino('/dev/ttyACM0')

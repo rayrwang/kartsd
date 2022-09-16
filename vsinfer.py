@@ -13,10 +13,10 @@ window = pg.display.set_mode((810, 810))
 pg.init()
 
 # Init video and vs displays
-cap = cv.VideoCapture(0)
-cap.set(cv.CAP_PROP_FRAME_WIDTH, 128)
-cap.set(cv.CAP_PROP_FRAME_HEIGHT, 96)
-cap.set(cv.CAP_PROP_FPS, 30)
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
+cap.set(cv2.CAP_PROP_FPS, 30)
 
 cv2.namedWindow("a", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("a", 512, 384)
