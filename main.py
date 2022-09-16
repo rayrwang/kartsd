@@ -9,9 +9,9 @@ import cv2
 import torch
 
 import hardware
-from network import Network
+from network import SteerNet, VSNet
 
-model = Network()
+model = SteerNet()
 device = torch.device("cpu")
 model.load_state_dict(torch.load("light_sides.pth", map_location=device))
 model.eval()

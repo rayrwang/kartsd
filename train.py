@@ -3,44 +3,54 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 
-from network import Network
+from network import VSNet
 
 
 class TrainingData(Dataset):
     def __init__(self):
-        # data = np.loadtxt("center.csv", dtype="float32", delimiter=",")
-        # self.x = torch.from_numpy(data[:, 1:])
+        # # data = np.loadtxt("center.csv", dtype="float32", delimiter=",")
+        # # self.x = torch.from_numpy(data[:, 1:])
+        # # self.x = torch.reshape(self.x, (-1, 96, 128, 3))
+        # # self.x = torch.swapaxes(self.x, 1, 3)
+        # # self.x = torch.swapaxes(self.x, 2, 3)
+        # # self.y = torch.from_numpy(data[:, [0]])
+        # #
+        # # self.n_samples = data.shape[0]
+        #
+        # left_np = np.loadtxt("left.csv", dtype="float32", delimiter=",")
+        # center_np = np.loadtxt("center.csv", dtype="float32", delimiter=",")
+        # right_np = np.loadtxt("right.csv", dtype="float32", delimiter=",")
+        #
+        # left = torch.from_numpy(left_np[:, 1:])
+        # center = torch.from_numpy(center_np[:, 1:])
+        # right = torch.from_numpy(right_np[:, 1:])
+        #
+        # self.x = torch.cat((left, center, right))
+        #
         # self.x = torch.reshape(self.x, (-1, 96, 128, 3))
         # self.x = torch.swapaxes(self.x, 1, 3)
         # self.x = torch.swapaxes(self.x, 2, 3)
-        # self.y = torch.from_numpy(data[:, [0]])
         #
-        # self.n_samples = data.shape[0]
+        # left = torch.from_numpy(left_np[:, [0]])
+        # center = torch.from_numpy(center_np[:, [0]])
+        # right = torch.from_numpy(right_np[:, [0]])
+        #
+        # left = torch.full(left.shape, -3.5)
+        # right = torch.full(right.shape, 0.5)
+        #
+        # self.y = torch.cat((left, center, right))
+        #
+        # self.n_samples = self.x.shape[0]
 
-        left_np = np.loadtxt("left.csv", dtype="float32", delimiter=",")
-        center_np = np.loadtxt("center.csv", dtype="float32", delimiter=",")
-        right_np = np.loadtxt("right.csv", dtype="float32", delimiter=",")
+        data = np.loadtxt("vs_train.csv", dtype="float32", delimiter=",")
 
-        left = torch.from_numpy(left_np[:, 1:])
-        center = torch.from_numpy(center_np[:, 1:])
-        right = torch.from_numpy(right_np[:, 1:])
-
-        self.x = torch.cat((left, center, right))
-
+        self.x = torch.from_numpy(data[:, :36864])
         self.x = torch.reshape(self.x, (-1, 96, 128, 3))
         self.x = torch.swapaxes(self.x, 1, 3)
         self.x = torch.swapaxes(self.x, 2, 3)
+        self.y = torch.from_numpy(data[:, 36864:])
 
-        left = torch.from_numpy(left_np[:, [0]])
-        center = torch.from_numpy(center_np[:, [0]])
-        right = torch.from_numpy(right_np[:, [0]])
-
-        left = torch.full(left.shape, -3.5)
-        right = torch.full(right.shape, 0.5)
-
-        self.y = torch.cat((left, center, right))
-
-        self.n_samples = self.x.shape[0]
+        self.n_samples = data.shape[0]
 
     def __getitem__(self, index):
         return self.x[index], self.y[index]
@@ -73,7 +83,7 @@ batch_size = 100
 # x = f.pool(f.relu(conv2(x)))
 # print(x.shape)
 
-model = Network().to(device)
+model = VSNet().to(device)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
@@ -101,4 +111,4 @@ with torch.no_grad():
         loss = criterion(outputs, labels)
         print(loss)
 
-torch.save(model.state_dict(), "light4_sides.pth")
+torch.save(model.state_dict(), "vs.pth")

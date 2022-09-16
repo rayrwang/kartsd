@@ -23,14 +23,17 @@ window = pg.display.set_mode((810, 810))
 pg.init()
 
 # Load data
-vid_arr = np.loadtxt("center - Copy.csv", dtype="float16", delimiter=",")
+vid_arr = np.loadtxt("train2.csv", dtype="float16", delimiter=",")
 steer_arr = vid_arr[:, 0]
 vid_arr = np.delete(vid_arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
 
 # Init video and vs displays
 prev_img_num = -1
-img_num = 0
+
+# train1 1186 - evens
+# train 2 990 - evens
+img_num = 296
 
 cv2.namedWindow("a", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("a", 512, 384)
@@ -42,16 +45,20 @@ car = pg.Surface((70, 110))
 pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
 
 vs = np.zeros((70, 81))
-prev = False
 with open("vs_train.csv", "a") as file:
     while True:
+        save = False
+
         # Handle key pressed
         for event in pg.event.get():
             if event.type == pg.KEYDOWN:
                 keys = pg.key.get_pressed()
                 if keys[pg.K_d]:
                     img_num += 1
-                if keys[pg.K_a]:
+                elif keys[pg.K_s]:
+                    img_num += 1
+                    save = True
+                elif keys[pg.K_a]:
                     img_num -= 1
 
         # Handle mouse click to flip pixels
@@ -63,12 +70,14 @@ with open("vs_train.csv", "a") as file:
 
         if buttons[0]:
             vs[69 - y, x] = 1
+        elif buttons[1]:
+            vs[69-y-3: 69-y+3, x-3: x+3] = 0
         elif buttons[2]:
             vs[69 - y, x] = 0
 
         if img_num != prev_img_num:
             # Write previous completed image and vs to file
-            if prev:
+            if save:
                 img = img.reshape(36864)
                 vs = vs.reshape(5670)
                 full = np.concatenate((img, vs))
@@ -80,7 +89,7 @@ with open("vs_train.csv", "a") as file:
             img = img.reshape(96, 128, 3)
             cv2.imshow("a", img)
 
-            edges_img = cv2.Canny(img, 100, 200, apertureSize=3)
+            edges_img = cv2.Canny(img, 150, 250, apertureSize=3)
 
             edges_img[:29] = 0
             cv2.imshow("b", edges_img)
