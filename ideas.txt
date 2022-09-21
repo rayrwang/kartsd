@@ -1,0 +1,4 @@
+reduce width of vs output
+compare network predicting edges in image & project, vs.
+predict vs directly
+try function on vs network output (e.g. square)
