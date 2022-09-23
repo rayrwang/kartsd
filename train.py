@@ -111,4 +111,4 @@ with torch.no_grad():
         loss = criterion(outputs, labels)
         print(loss)
 
-torch.save(model.state_dict(), "vs.pth")
+torch.save(model.state_dict(), "models/vs.pth")

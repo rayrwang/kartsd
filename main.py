@@ -13,7 +13,7 @@ from network import SteerNet, VSNet
 
 model = SteerNet()
 device = torch.device("cpu")
-model.load_state_dict(torch.load("light_sides.pth", map_location=device))
+model.load_state_dict(torch.load("models/light_sides.pth", map_location=device))
 model.eval()
 
 cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=200)
