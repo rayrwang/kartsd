@@ -1,7 +1,7 @@
 # kartsd
 
-## Hardware:
+### Hardware:
 
-Raspberry Pi & camera
-stepper motor
-angle sensor
+- Raspberry Pi & camera
+- stepper motor
+- angle sensor
