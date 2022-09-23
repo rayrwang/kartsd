@@ -1,5 +1,6 @@
 import time
 import math
+import threading
 
 import numpy as np
 import cv2
@@ -7,6 +8,12 @@ import pygame as pg
 import torch
 
 from network import VSNet
+
+
+def capture(cap):
+    while True:
+        global img
+        _, img = cap.read(0)
 
 
 window = pg.display.set_mode((810, 810))
@@ -18,6 +25,9 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
 cap.set(cv2.CAP_PROP_FPS, 30)
 
+capture_thread = threading.Thread(target=capture, args=[cap])
+capture_thread.start()
+
 car = pg.Surface((70, 110))
 pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
 
@@ -26,9 +36,9 @@ model = VSNet().to(device)
 model.load_state_dict(torch.load("models/vs.pth", map_location=device))
 
 model.eval()
+
+time.sleep(5)
 while True:
-    # steer = steer_arr[img_num]
-    _, img = cap.read(0)
     cv2.imshow("", img)
 
     if cv2.waitKey(1) == ord("f"):
@@ -49,7 +59,6 @@ while True:
     window.blit(car, (370, 700))
     for n_y, y_row in enumerate(vs_pred.reshape(70, 81)):
         for n_x, x in enumerate(y_row):
-            # if x != 0:
             x = 255 - x*255
             x = max(0, x)
             x = min(255, x)
