@@ -77,7 +77,6 @@ while True:
         cv2.VideoCapture(0).release()
         break
 
-    # time.sleep(0.1)
     keys = pg.key.get_pressed()
     if keys[pg.K_a]:
         img_num -= 5
