@@ -18,9 +18,6 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
 cap.set(cv2.CAP_PROP_FPS, 30)
 
-cv2.namedWindow("a", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("a", 512, 384)
-
 car = pg.Surface((70, 110))
 pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
 
@@ -32,7 +29,7 @@ model.eval()
 while True:
     # steer = steer_arr[img_num]
     _, img = cap.read(0)
-    cv2.imshow("a", img)
+    cv2.imshow("", img)
 
     if cv2.waitKey(1) == ord("f"):
         cv2.destroyAllWindows()
