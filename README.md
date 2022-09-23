@@ -1,4 +1,4 @@
-# kart-sd (self driving kart)
+# kartsd (self driving kart)
 
 Lane following go kart using Pytorch & CNNs.
 
