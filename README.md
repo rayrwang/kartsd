@@ -1,9 +1,7 @@
-# kartsd (self driving kart)
+# kartsd
 
-Lane following go kart using Pytorch & CNNs.
+### Hardware:
 
-Hardware:
-
-Raspberry Pi with camera
-
-stepper motor & angle sensor
+- Raspberry Pi & camera
+- stepper motor
+- angle sensor
