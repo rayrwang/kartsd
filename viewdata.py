@@ -9,7 +9,7 @@ window = pg.display.set_mode((610, 810))
 pg.init()
 
 # Load data
-arr = np.loadtxt("vstrainingdata/noshadows_clean_fixed.csv", delimiter=",")
+arr = np.loadtxt("vstrainingdata/vs_train.csv", delimiter=",")
 vid_arr = arr[:, :36864]
 vid_arr = vid_arr.astype("uint8")
 vs_arr = arr[:, 36864:]
@@ -53,7 +53,7 @@ while True:
         cv2.VideoCapture(0).release()
         break
 
-    time.sleep(0.1)
+    time.sleep(0.01)
     keys = pg.key.get_pressed()
     if keys[pg.K_w]:
         vid_arr = np.delete(vid_arr, img_num, 0)

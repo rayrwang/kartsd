@@ -13,7 +13,7 @@ window = pg.display.set_mode((610, 810))
 pg.init()
 
 # Load data
-arr = np.loadtxt("rawvids/train1.csv", dtype="float16", delimiter=",")
+arr = np.loadtxt("rawvids/4.csv", dtype="float16", delimiter=",")
 steer_arr = arr[:, 0]
 vid_arr = np.delete(arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")

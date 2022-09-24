@@ -33,7 +33,7 @@ pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/noshadows.pth", map_location=device))
+model.load_state_dict(torch.load("models/vs.pth", map_location=device))
 
 model.eval()
 
