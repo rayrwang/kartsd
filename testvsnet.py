@@ -13,7 +13,7 @@ window = pg.display.set_mode((610, 810))
 pg.init()
 
 # Load data
-arr = np.loadtxt("rawvids/4.csv", dtype="float16", delimiter=",")
+arr = np.loadtxt("rawvids/3.csv", dtype="float16", delimiter=",")
 steer_arr = arr[:, 0]
 vid_arr = np.delete(arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
@@ -38,7 +38,7 @@ pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/noshadows.pth", map_location=device))
+model.load_state_dict(torch.load("models/vs.pth", map_location=device))
 
 model.eval()
 while True:
