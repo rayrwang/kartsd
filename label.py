@@ -23,7 +23,7 @@ window = pg.display.set_mode((810, 810))
 pg.init()
 
 # Load data
-vid_arr = np.loadtxt("right.csv", dtype="float16", delimiter=",")
+vid_arr = np.loadtxt("rawvids/train1.csv", dtype="float16", delimiter=",")
 steer_arr = vid_arr[:, 0]
 vid_arr = np.delete(vid_arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
@@ -51,7 +51,7 @@ car = pg.Surface((70, 110))
 pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
 
 vs = np.zeros((70, 81))
-with open("vs_train_rough.csv", "a") as file:
+with open(r"vstrainingdata/vs_train_rough.csv.csv", "a") as file:
     while True:
         save = False
 

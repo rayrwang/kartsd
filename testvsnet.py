@@ -9,11 +9,11 @@ import torch
 from network import VSNet
 
 
-window = pg.display.set_mode((810, 810))
+window = pg.display.set_mode((610, 810))
 pg.init()
 
 # Load data
-arr = np.loadtxt("rawvids/1.csv", dtype="float16", delimiter=",")
+arr = np.loadtxt("rawvids/train1.csv", dtype="float16", delimiter=",")
 steer_arr = arr[:, 0]
 vid_arr = np.delete(arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
@@ -38,7 +38,7 @@ pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/vs.pth", map_location=device))
+model.load_state_dict(torch.load("models/noshadows.pth", map_location=device))
 
 model.eval()
 while True:
@@ -57,8 +57,8 @@ while True:
 
         # Display vs
         window.fill((255, 255, 255))
-        window.blit(car, (370, 700))
-        for n_y, y_row in enumerate(vs_pred.reshape(70, 81)):
+        window.blit(car, (270, 700))
+        for n_y, y_row in enumerate(vs_pred.reshape(70, 61)):
             for n_x, x in enumerate(y_row):
                 # if x != 0:
                 x = 255 - x*255

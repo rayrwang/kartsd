@@ -42,7 +42,7 @@ class TrainingData(Dataset):
         #
         # self.n_samples = self.x.shape[0]
 
-        data = np.loadtxt("vs_train.csv", dtype="float32", delimiter=",")
+        data = np.loadtxt("vstrainingdata/noshadows_clean.csv", dtype="float32", delimiter=",")
 
         self.x = torch.from_numpy(data[:, :36864])
         self.x = torch.reshape(self.x, (-1, 96, 128, 3))
@@ -87,7 +87,7 @@ model = VSNet().to(device)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-for epoch in range(100):
+for epoch in range(25):
     for step, (images, labels) in enumerate(train_dataloader):
         images = images.to(device)
         labels = labels.to(device)
@@ -111,4 +111,4 @@ with torch.no_grad():
         loss = criterion(outputs, labels)
         print(loss)
 
-torch.save(model.state_dict(), "models/vs.pth")
+torch.save(model.state_dict(), "models/noshadows.pth")

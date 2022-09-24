@@ -34,7 +34,7 @@ class VSNet(nn.Module):
         self.conv2 = nn.Conv2d(5, 10, 5, stride=2)
         self.fc1 = nn.Linear(350, 700)
         self.fc2 = nn.Linear(700, 1400)
-        self.fc3 = nn.Linear(1400, 5670)
+        self.fc3 = nn.Linear(1400, 4270)
 
     def forward(self, x):
         x = self.pool(f.relu(self.conv1(x)))
@@ -45,3 +45,4 @@ class VSNet(nn.Module):
         x = self.fc3(x)
 
         return x
+
