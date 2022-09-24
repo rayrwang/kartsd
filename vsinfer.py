@@ -16,7 +16,7 @@ def capture(cap):
         _, img = cap.read(0)
 
 
-window = pg.display.set_mode((810, 810))
+window = pg.display.set_mode((610, 810))
 pg.init()
 
 # Init video and vs displays
