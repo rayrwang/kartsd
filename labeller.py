@@ -23,7 +23,7 @@ window = pg.display.set_mode((610, 810))
 pg.init()
 
 # Load data
-vid_arr = np.loadtxt("rawvids/2.csv", dtype="float16", delimiter=",")
+vid_arr = np.loadtxt("rawvids/1.csv", dtype="float16", delimiter=",")
 steer_arr = vid_arr[:, 0]
 vid_arr = np.delete(vid_arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
@@ -35,7 +35,7 @@ prev_img_num = -1
 # 1 evens complete
 # 2 evens complete
 
-img_num = 1316
+img_num = 0
 prev_lower, prev_upper = 30000, 40000
 lower, upper = 30000, 40000
 
@@ -48,7 +48,7 @@ cv2.resizeWindow("b", 512, 384)
 car = pg.Surface((70, 110))
 
 vs = np.zeros((70, 61))
-with open(r"vstrainingdata/noshadows_rough.csv", "a") as file:
+with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
     while True:
         save = False
 

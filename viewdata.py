@@ -63,7 +63,7 @@ while True:
     if keys[pg.K_d]:
         img_num += 1
 
-# with open("vstrainingdata/noshadows_clean.csv", "a") as file:
+# with open("vstrainingdata/vs_train_clean.csv", "a") as file:
 #     vid_arr = vid_arr.reshape(-1, 36864)
 #     vs_arr = vs_arr.reshape(-1, 4270)
 #     full = np.concatenate((vid_arr, vs_arr), axis=1)
