@@ -17,9 +17,13 @@ def capture(cap0, cap1, cap2):
         global img0
         global img1
         global img2
+        global success
         _, img0 = cap0.read(0)
+        success = success and _
         _, img1 = cap1.read(0)
+        success = success and _
         _, img2 = cap2.read(0)
+        success = success and _
 
 
 cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=33)
@@ -39,9 +43,10 @@ with open("train.csv", "a") as file:
         for event in pg.event.get():
             if event.type == update:
                 # Update display and record frame at same time
-                cv2.imshow("0", img0)
-                cv2.imshow("1", img1)
-                cv2.imshow("2", img2)
+                if success:
+                    cv2.imshow("0", img0)
+                    cv2.imshow("1", img1)
+                    cv2.imshow("2", img2)
 
                 # flat = img.reshape(36864)
                 # flat = flat.astype("float16")
