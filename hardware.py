@@ -28,6 +28,7 @@ def init_hardware(update_msec):
     cap2.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
     cap2.set(cv2.CAP_PROP_FPS, 30)
 
+    print("ardu")
     # Init arduino
     try:
         board = pf.Arduino('/dev/ttyAMA0')
@@ -47,6 +48,7 @@ def init_hardware(update_msec):
     angle_read = 0.5
     last = 0.5
 
+    print("display")
     # Init pygame display
     window = pg.display.set_mode((0, 0))
     pg.init()
