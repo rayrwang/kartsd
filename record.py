@@ -21,6 +21,7 @@ def capture(cap0, cap10, cap11, cap2):
         _, img1 = cap10.read(0)
         if not _:
             _, img1 = cap11.read(0)
+            print(img1.shape)
         _, img2 = cap2.read(0)
 
 
