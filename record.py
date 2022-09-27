@@ -10,7 +10,7 @@ import pygame as pg
 
 import hardware
 
-cap0, cap10, cap11, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=33)
+cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=33)
 
 time.sleep(5)
 with open("train.csv", "a") as file:
@@ -26,9 +26,7 @@ with open("train.csv", "a") as file:
             if event.type == update:
                 # Update display and record frame at same time
                 _, img0 = cap0.read(0)
-                _, img1 = cap10.read(0)
-                if not _:
-                    _, img1 = cap11.read(0)
+                _, img1 = cap1.read(0)
                 _, img2 = cap2.read(0)
 
                 cv2.imshow("0", img0)
