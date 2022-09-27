@@ -24,7 +24,7 @@ def init_hardware(update_msec):
     cap2.set(cv2.CAP_PROP_FPS, 30)
 
     # Init arduino
-    board = pf.Arduino('/dev/ttyACM0')
+    board = pf.Arduino('/dev/ttyACM1')
     it = pf.util.Iterator(board)
     it.start()
     board.analog[0].enable_reporting()
