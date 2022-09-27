@@ -38,11 +38,18 @@ with open("train.csv", "a") as file:
         for event in pg.event.get():
             if event.type == update:
                 # Update display and record frame at same time
-                cv2.imshow("0", img0)
-
-                cv2.imshow("1", img1)
-
-                cv2.imshow("2", img2)
+                try:
+                    cv2.imshow("0", img0)
+                finally:
+                    pass
+                try:
+                    cv2.imshow("1", img1)
+                finally:
+                    pass
+                try:
+                    cv2.imshow("2", img2)
+                finally:
+                    pass
 
                 # flat = img.reshape(36864)
                 # flat = flat.astype("float16")
