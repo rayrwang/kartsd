@@ -26,10 +26,10 @@ def init_hardware(update_msec):
     # Init arduino
     try:
         board = pf.Arduino('/dev/ttyAMA0')
-    except FileNotFoundError:
+    except (FileNotFoundError, OSError):
         try:
             board = pf.Arduino('/dev/ttyACM0')
-        except FileNotFoundError:
+        except (FileNotFoundError, OSError):
             board = pf.Arduino('/dev/ttyACM1')
 
     it = pf.util.Iterator(board)
