@@ -18,7 +18,7 @@ def init_hardware(update_msec):
     cap1.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
     cap1.set(cv2.CAP_PROP_FPS, 30)
 
-    cap2 = cv2.VideoCapture(2)
+    cap2 = cv2.VideoCapture(3)
     cap2.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
     cap2.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
     cap2.set(cv2.CAP_PROP_FPS, 30)
