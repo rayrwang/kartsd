@@ -22,14 +22,20 @@ with open("train.csv", "a") as file:
         for event in pg.event.get():
             if event.type == update:
                 # Update display and record frame at same time
-                _, img = cap.read(0)
-                cv2.imshow("", img)
+                _, img0 = cap.read(0)
+                cv2.imshow("", img0)
 
-                flat = img.reshape(36864)
-                flat = flat.astype("float16")
-                full = np.insert(flat, 0, degree)
+                _, img1 = cap.read(1)
+                cv2.imshow("", img1)
 
-                np.savetxt(file, [full], fmt="%.2f", delimiter=",", newline="")
-                file.write("\n")
+                _, img2 = cap.read(2)
+                cv2.imshow("", img2)
+
+                # flat = img.reshape(36864)
+                # flat = flat.astype("float16")
+                # full = np.insert(flat, 0, degree)
+
+                # np.savetxt(file, [full], fmt="%.2f", delimiter=",", newline="")
+                # file.write("\n")
 
                 hardware.update_display(window, font0, font1, font2, angle_region, angle_read, degree, 0)
