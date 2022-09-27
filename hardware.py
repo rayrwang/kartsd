@@ -24,7 +24,14 @@ def init_hardware(update_msec):
     cap2.set(cv2.CAP_PROP_FPS, 30)
 
     # Init arduino
-    board = pf.Arduino('/dev/ttyACM1')
+    try:
+        board = pf.Arduino('/dev/ttyAMA0')
+    except FileNotFoundError:
+        try:
+            board = pf.Arduino('/dev/ttyACM0')
+        except FileNotFoundError:
+            board = pf.Arduino('/dev/ttyACM1')
+
     it = pf.util.Iterator(board)
     it.start()
     board.analog[0].enable_reporting()
