@@ -19,7 +19,9 @@ def capture(cap0, cap10, cap11, cap2):
         global img2
         _, img0 = cap0.read(0)
         _, img1 = cap10.read(0)
+        print(_)
         if not _:
+            print("backup")
             img1 = cap11.read(0)
         _, img2 = cap2.read(0)
 
