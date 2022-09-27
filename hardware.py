@@ -13,10 +13,15 @@ def init_hardware(update_msec):
     cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
     cap0.set(cv2.CAP_PROP_FPS, 30)
 
-    cap1 = cv2.VideoCapture(2)
-    cap1.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
-    cap1.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
-    cap1.set(cv2.CAP_PROP_FPS, 30)
+    cap10 = cv2.VideoCapture(2)
+    cap10.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
+    cap10.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
+    cap10.set(cv2.CAP_PROP_FPS, 30)
+
+    cap11 = cv2.VideoCapture(2)
+    cap11.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
+    cap11.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
+    cap11.set(cv2.CAP_PROP_FPS, 30)
 
     cap2 = cv2.VideoCapture(4)
     cap2.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
@@ -56,7 +61,7 @@ def init_hardware(update_msec):
     font1 = pg.font.Font("Helvetica.ttf", 75)
     font2 = pg.font.Font("Helvetica.ttf", 25)
 
-    return cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update
+    return cap0, cap10, cap11, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update
 
 
 def update_angle(board, angle_region, angle_read, last):

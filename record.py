@@ -12,17 +12,19 @@ import pygame as pg
 import hardware
 
 
-def capture(cap0, cap1, cap2):
+def capture(cap0, cap10, cap11, cap2):
     while True:
         global img0
         global img1
         global img2
         _, img0 = cap0.read(0)
-        _, img1 = cap1.read(0)
+        _, img1 = cap10.read(0)
+        if not _:
+            img1 = cap11.read(0)
         _, img2 = cap2.read(0)
 
 
-cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=33)
+cap0, cap10, cap11, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=33)
 capture_thread = threading.Thread(target=capture, args=[cap0, cap1, cap2])
 capture_thread.start()
 time.sleep(5)
