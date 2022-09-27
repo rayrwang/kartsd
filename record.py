@@ -3,12 +3,14 @@ Record video to train.csv
 """
 
 import threading
+import time
 
 import cv2
 import numpy as np
 import pygame as pg
 
 import hardware
+
 
 def capture(cap0, cap1, cap2):
     while True:
@@ -19,9 +21,11 @@ def capture(cap0, cap1, cap2):
         _, img1 = cap1.read(0)
         _, img2 = cap2.read(0)
 
+
 cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=33)
 capture_thread = threading.Thread(target=capture, args=[cap0, cap1, cap2])
 capture_thread.start()
+time.sleep(5)
 with open("train.csv", "a") as file:
     while True:
         if cv2.waitKey(1) == ord("f"):
