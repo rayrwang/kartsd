@@ -12,7 +12,7 @@ import pygame as pg
 import hardware
 
 
-def capture(cap):
+def capture(cap0, cap1, cap2):
     while True:
         global img0
         global img1
