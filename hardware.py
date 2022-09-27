@@ -36,7 +36,6 @@ def init_hardware(update_msec):
     angle_read = 0.5
     last = 0.5
 
-    print("display")
     # Init pygame display
     window = pg.display.set_mode((0, 0))
     pg.init()
