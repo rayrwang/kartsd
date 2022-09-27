@@ -10,17 +10,17 @@ def init_hardware(update_msec):
     # Init camera
     cap0 = cv2.VideoCapture(0)
     cap0.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
-    cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
+    cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
     cap0.set(cv2.CAP_PROP_FPS, 30)
 
     cap1 = cv2.VideoCapture(1)
     cap1.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
-    cap1.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
+    cap1.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
     cap1.set(cv2.CAP_PROP_FPS, 30)
 
     cap2 = cv2.VideoCapture(3)
     cap2.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
-    cap2.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
+    cap2.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
     cap2.set(cv2.CAP_PROP_FPS, 30)
 
     # Init arduino
