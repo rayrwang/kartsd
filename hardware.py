@@ -8,10 +8,20 @@ import cv2
 
 def init_hardware(update_msec):
     # Init camera
-    cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
-    cap.set(cv2.CAP_PROP_FPS, 30)
+    cap0 = cv2.VideoCapture(0)
+    cap0.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
+    cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
+    cap0.set(cv2.CAP_PROP_FPS, 30)
+
+    cap1 = cv2.VideoCapture(1)
+    cap1.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
+    cap1.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
+    cap1.set(cv2.CAP_PROP_FPS, 30)
+
+    cap2 = cv2.VideoCapture(2)
+    cap2.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
+    cap2.set(cv2.CAP_PROP_FRAME_HEIGHT, 72)
+    cap2.set(cv2.CAP_PROP_FPS, 30)
 
     # Init arduino
     board = pf.Arduino('/dev/ttyACM0')
@@ -39,7 +49,7 @@ def init_hardware(update_msec):
     font1 = pg.font.Font("Helvetica.ttf", 75)
     font2 = pg.font.Font("Helvetica.ttf", 25)
 
-    return cap, board, angle_region, angle_read, last, window, font0, font1, font2, update
+    return cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update
 
 
 def update_angle(board, angle_region, angle_read, last):
