@@ -40,9 +40,9 @@ with open("train.csv", "a") as file:
             if event.type == update:
                 # Update display and record frame at same time
                 if img0 is not None and img1 is not None and img2 is not None:
-                cv2.imshow("0", img0)
-                cv2.imshow("1", img1)
-                cv2.imshow("2", img2)
+                    cv2.imshow("0", img0)
+                    cv2.imshow("1", img1)
+                    cv2.imshow("2", img2)
 
                 # flat = img.reshape(36864)
                 # flat = flat.astype("float16")
