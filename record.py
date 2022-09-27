@@ -23,13 +23,13 @@ with open("train.csv", "a") as file:
             if event.type == update:
                 # Update display and record frame at same time
                 _, img0 = cap.read(0)
-                cv2.imshow("", img0)
+                cv2.imshow("0", img0)
 
                 _, img1 = cap.read(1)
-                cv2.imshow("", img1)
+                cv2.imshow("1", img1)
 
                 _, img2 = cap.read(2)
-                cv2.imshow("", img2)
+                cv2.imshow("2", img2)
 
                 # flat = img.reshape(36864)
                 # flat = flat.astype("float16")
