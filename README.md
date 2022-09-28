@@ -2,6 +2,6 @@
 
 ### Hardware:
 
-- Raspberry Pi & camera
+- 3 cameras
 - stepper motor
 - angle sensor
