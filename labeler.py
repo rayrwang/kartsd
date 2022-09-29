@@ -24,9 +24,9 @@ window = pg.display.set_mode((405, 655))
 pg.init()
 
 # Load data
-vid_arr = np.loadtxt("rawvids/inter5.csv", dtype="float16", delimiter=",")
-steer_arr = vid_arr[:, 0]
-vid_arr = np.delete(vid_arr, 0, axis=1)
+vid_arr = np.loadtxt("rawvids/testvid.csv", dtype="float16", delimiter=",")
+# steer_arr = vid_arr[:, 0]
+# vid_arr = np.delete(vid_arr, 0, axis=1)
 vid_arr = vid_arr.astype("uint8")
 
 # Init video and vs displays
@@ -40,11 +40,18 @@ img_num = 0
 prev_lower, prev_upper = 30000, 40000
 lower, upper = 30000, 40000
 
-cv2.namedWindow("a", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("a", 512, 384)
-
-cv2.namedWindow("b", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("b", 512, 384)
+cv2.namedWindow("1", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("1", 512, 384)
+cv2.namedWindow("2", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("2", 512, 384)
+cv2.namedWindow("3", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("3", 512, 384)
+cv2.namedWindow("4", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("4", 512, 384)
+cv2.namedWindow("5", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("5", 512, 384)
+cv2.namedWindow("6", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("6", 512, 384)
 
 car = pg.Surface((35, 55))
 
@@ -58,12 +65,12 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
             if event.type == pg.KEYDOWN:
                 keys = pg.key.get_pressed()
                 if keys[pg.K_d]:
-                    img_num += 20
+                    img_num += 1
                 elif keys[pg.K_s]:
-                    img_num += 20
+                    img_num += 1
                     save = True
                 elif keys[pg.K_a]:
-                    img_num -= 20
+                    img_num -= 1
                 elif keys[pg.K_r]:
                     lower += 5000
                 elif keys[pg.K_f]:
@@ -99,33 +106,46 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
                 np.savetxt(file, [full], fmt="%.0f", delimiter=",")
 
             # Get new image
-            steer = steer_arr[img_num]
-            img = vid_arr[img_num]
-            img = img.reshape(96, 128, 3)
-            cv2.imshow("a", img)
+            # steer = steer_arr[img_num]
+            images = vid_arr[img_num]
+            img0 = images[0:36864]
+            img0 = img0.reshape(96, 128, 3)
+            img1 = images[36864:112896]
+            img1 = img1.reshape(144, 176, 3)
+            img2 = images[112896:]
+            img2 = img2.reshape(144, 176, 3)
+            cv2.imshow("1", img0)
+            cv2.imshow("2", img1)
+            cv2.imshow("3", img2)
 
             # Compute edges
-            edges_img = cv2.Canny(img, lower, upper, apertureSize=7, L2gradient=True)
-            edges_img[:25] = 0
-            cv2.imshow("b", edges_img)
-            print(steer, img_num, vid_arr.shape[0], lower, upper)
+            edges_img0 = cv2.Canny(img0, lower, upper, apertureSize=7, L2gradient=True)
+            edges_img0[:25] = 0
+            cv2.imshow("4", edges_img0)
+            edges_img1 = cv2.Canny(img1, lower, upper, apertureSize=7, L2gradient=True)
+            edges_img1[:25] = 0
+            cv2.imshow("5", edges_img1)
+            edges_img2 = cv2.Canny(img2, lower, upper, apertureSize=7, L2gradient=True)
+            edges_img2[:25] = 0
+            cv2.imshow("6", edges_img2)
+            print(img_num, vid_arr.shape[0], lower, upper)
 
-            # Compute physical x and y for pixels in edges
-            vs = np.zeros((120, 81))  # rows, columns
-            for px_y, row in enumerate(edges_img[25:]):  # px_y : pixels below horizon
-                for px_x, pos in enumerate(row):  # px_x : pixels from left (48 to center)
-                    if pos == 255:
-                        project((px_x, px_y),
-                                (px_x + 0.1, px_y + 0.1), (px_x - 0.1, px_y + 0.1),
-                                (px_x + 0.2, px_y + 0.2), (px_x - 0.2, px_y + 0.2),
-                                (px_x + 0.3, px_y + 0.3), (px_x - 0.3, px_y + 0.3),
-                                (px_x + 0.4, px_y + 0.4), (px_x - 0.4, px_y + 0.4),
-                                (px_x + 0.5, px_y + 0.5), (px_x - 0.5, px_y + 0.5),
-                                (px_x - 0.1, px_y - 0.1), (px_x + 0.1, px_y - 0.1),
-                                (px_x - 0.2, px_y - 0.2), (px_x + 0.2, px_y - 0.2),
-                                (px_x - 0.3, px_y - 0.3), (px_x + 0.3, px_y - 0.3),
-                                (px_x - 0.4, px_y - 0.4), (px_x + 0.4, px_y - 0.4),
-                                (px_x - 0.5, px_y - 0.5), (px_x + 0.5, px_y - 0.5))
+            # # Compute physical x and y for pixels in edges
+            # vs = np.zeros((120, 81))  # rows, columns
+            # for px_y, row in enumerate(edges_img[25:]):  # px_y : pixels below horizon
+            #     for px_x, pos in enumerate(row):  # px_x : pixels from left (48 to center)
+            #         if pos == 255:
+            #             project((px_x, px_y),
+            #                     (px_x + 0.1, px_y + 0.1), (px_x - 0.1, px_y + 0.1),
+            #                     (px_x + 0.2, px_y + 0.2), (px_x - 0.2, px_y + 0.2),
+            #                     (px_x + 0.3, px_y + 0.3), (px_x - 0.3, px_y + 0.3),
+            #                     (px_x + 0.4, px_y + 0.4), (px_x - 0.4, px_y + 0.4),
+            #                     (px_x + 0.5, px_y + 0.5), (px_x - 0.5, px_y + 0.5),
+            #                     (px_x - 0.1, px_y - 0.1), (px_x + 0.1, px_y - 0.1),
+            #                     (px_x - 0.2, px_y - 0.2), (px_x + 0.2, px_y - 0.2),
+            #                     (px_x - 0.3, px_y - 0.3), (px_x + 0.3, px_y - 0.3),
+            #                     (px_x - 0.4, px_y - 0.4), (px_x + 0.4, px_y - 0.4),
+            #                     (px_x - 0.5, px_y - 0.5), (px_x + 0.5, px_y - 0.5))
 
             prev_img_num = img_num
 
