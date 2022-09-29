@@ -13,18 +13,24 @@ def init_hardware(update_msec):
     cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
     cap0.set(cv2.CAP_PROP_FPS, 30)
 
-    cap1 = cv2.VideoCapture(1)
-    cap1.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
-    cap1.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
+    cap1 = cv2.VideoCapture(42)
+    cap1.set(cv2.CAP_PROP_FRAME_WIDTH, 176)
+    cap1.set(cv2.CAP_PROP_FRAME_HEIGHT, 144)
     cap1.set(cv2.CAP_PROP_FPS, 30)
 
-    cap2 = cv2.VideoCapture(3)
-    cap2.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
-    cap2.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
+    cap2 = cv2.VideoCapture(43)
+    cap2.set(cv2.CAP_PROP_FRAME_WIDTH, 176)
+    cap2.set(cv2.CAP_PROP_FRAME_HEIGHT, 144)
     cap2.set(cv2.CAP_PROP_FPS, 30)
 
     # Init arduino
-    board = pf.Arduino('/dev/ttyACM0')
+    try:
+        board = pf.Arduino('/dev/ttyACM0')
+    except:
+        try:
+            board = pf.Arduino('/dev/ttyACM1')
+        except:
+            pass
 
     it = pf.util.Iterator(board)
     it.start()
