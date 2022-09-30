@@ -22,7 +22,7 @@ def capture(cap0, cap1, cap2):
         _, img2 = cap2.read(0)
 
 
-cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=500)
+cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=1000)
 
 capture_thread = threading.Thread(target=capture, args=[cap0, cap1, cap2])
 capture_thread.start()
@@ -41,14 +41,10 @@ with open("train.csv", "a") as file:
                 cv2.imshow("1", img1)
                 cv2.imshow("2", img2)
 
-                flat0 = img0.reshape(36864)
-                flat0 = flat0.astype("float16")
+                flat0 = img0.reshape(230400)
                 flat1 = img1.reshape(76032)
-                flat1 = flat1.astype("float16")
                 flat2 = img2.reshape(76032)
-                flat2 = flat2.astype("float16")
                 full = np.concatenate((flat0, flat1, flat2))
-                # full = np.insert(full, 0, degree)
 
                 np.savetxt(file, [full], fmt="%.0f", delimiter=",", newline="")
                 file.write("\n")
