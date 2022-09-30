@@ -34,8 +34,6 @@ with open("train.csv", "a") as file:
             cv2.VideoCapture(0).release()
             break
 
-        angle_region, angle_read, last, degree = hardware.update_angle(board, angle_region, angle_read, last)
-
         for event in pg.event.get():
             if event.type == update:
                 # Update display and record frame at same time
@@ -54,5 +52,3 @@ with open("train.csv", "a") as file:
 
                 np.savetxt(file, [full], fmt="%.0f", delimiter=",", newline="")
                 file.write("\n")
-
-                hardware.update_display(window, font0, font1, font2, angle_region, angle_read, degree, 0)
