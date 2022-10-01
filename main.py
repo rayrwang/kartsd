@@ -16,20 +16,22 @@ device = torch.device("cpu")
 model.load_state_dict(torch.load("models/light_sides.pth", map_location=device))
 model.eval()
 
-cap, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=200)
+cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=500)
+cap0.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
+cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
 center = -1.5
 gain = 1
 while True:
-    _, img = cap.read(0)
-    cv2.imshow("", img)
+    _, img0 = cap0.read(0)
+    cv2.imshow("", img0)
 
     if cv2.waitKey(1) == ord("f"):
         cv2.destroyAllWindows()
         cv2.VideoCapture(0).release()
         break
 
-    img = img.astype("float32")
-    x = torch.from_numpy(img[None, :])
+    img0 = img0.astype("float32")
+    x = torch.from_numpy(img0[None, :])
     x = torch.swapaxes(x, 1, 3)
     x = torch.swapaxes(x, 2, 3)
     x = x.to(device)
