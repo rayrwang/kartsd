@@ -9,8 +9,8 @@ import cv2
 def init_hardware(update_msec):
     # Init camera
     cap0 = cv2.VideoCapture(0)
-    cap0.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
-    cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
+    cap0.set(cv2.CAP_PROP_FRAME_WIDTH, 256)
+    cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 192)
     cap0.set(cv2.CAP_PROP_FPS, 30)
 
     cap1 = cv2.VideoCapture(42)

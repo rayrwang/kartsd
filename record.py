@@ -41,7 +41,7 @@ with open("train.csv", "a") as file:
                 cv2.imshow("1", img1)
                 cv2.imshow("2", img2)
 
-                flat0 = img0.reshape(36864)
+                flat0 = img0.reshape(147456)
                 flat1 = img1.reshape(76032)
                 flat2 = img2.reshape(76032)
                 full = np.concatenate((flat0, flat1, flat2))
