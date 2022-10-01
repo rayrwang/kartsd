@@ -9,32 +9,27 @@ import torch
 from network import VSNet
 
 
-window = pg.display.set_mode((610, 810))
+window = pg.display.set_mode((505, 655))
 pg.init()
 
 # Load data
-arr = np.loadtxt("rawvids/3.csv", dtype="float16", delimiter=",")
-steer_arr = arr[:, 0]
-vid_arr = np.delete(arr, 0, axis=1)
+arr = np.loadtxt("rawvids/three1.csv", dtype="float16", delimiter=",")
+vid_arr = arr[:, :188928]
 vid_arr = vid_arr.astype("uint8")
-
-# arr = np.loadtxt("vs_train.csv", delimiter=",")
-# vid_arr = arr[:, :36864]
-# vid_arr = vid_arr.astype("uint8")
-# vs_arr = arr[:, 36864:]
+data = np.loadtxt("vstrainingdata/vs_train.csv", dtype="float32", delimiter=",")
 
 # Init video and vs displays
 img_num = 0
 prev_img_num = -1
 
-cv2.namedWindow("a", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("a", 512, 384)
+cv2.namedWindow("1", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("1", 512, 384)
+cv2.namedWindow("2", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("2", 704, 576)
+cv2.namedWindow("3", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("3", 704, 576)
 
-# cv2.namedWindow("b", cv2.WINDOW_NORMAL)
-# cv2.resizeWindow("b", 512, 384)
-
-car = pg.Surface((70, 110))
-pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
+car = pg.Surface((35, 55))
 
 device = torch.device("cpu")
 model = VSNet().to(device)
@@ -43,31 +38,54 @@ model.load_state_dict(torch.load("models/vs.pth", map_location=device))
 model.eval()
 while True:
     if img_num != prev_img_num:
-        img = vid_arr[img_num]
-        img = img.reshape(96, 128, 3)
-        cv2.imshow("a", img)
+        images = vid_arr[img_num]
+        img0 = images[0:36864]
+        img0 = img0.reshape(96, 128, 3)
+        img1 = images[36864:112896]
+        img1 = img1.reshape(144, 176, 3)
+        img2 = images[112896:]
+        img2 = img2.reshape(144, 176, 3)
+        cv2.imshow("1", img0)
+        cv2.imshow("2", img1)
+        cv2.imshow("3", img2)
+        img0 = img0[25:, :, :]
+        img1 = img1[85:, :, :]
+        img2 = img2[85:, :, :]
 
         # Test inference
-        img = img.astype("float32")
-        x = torch.from_numpy(img[None, :])
-        x = torch.swapaxes(x, 1, 3)
-        x = torch.swapaxes(x, 2, 3)
-        x = x.to(device)
-        vs_pred = model(x)
+        img0 = img0.astype("float32")
+        img1 = img1.astype("float32")
+        img2 = img2.astype("float32")
+        x0 = torch.from_numpy(img0[None, :])
+        x0 = torch.swapaxes(x0, 1, 3)
+        x0 = torch.swapaxes(x0, 2, 3)
+        x0 = x0.to(device)
+
+        x1 = torch.from_numpy(img1[None, :])
+        x1 = torch.swapaxes(x1, 1, 3)
+        x1 = torch.swapaxes(x1, 2, 3)
+        x1 = x1.to(device)
+
+        x2 = torch.from_numpy(img2[None, :])
+        x2 = torch.swapaxes(x2, 1, 3)
+        x2 = torch.swapaxes(x2, 2, 3)
+        x2 = x2.to(device)
+        print(x0.shape, x1.shape, x2.shape)
+        vs_pred = model(x0, x1, x2)
 
         # Display vs
         window.fill((255, 255, 255))
-        window.blit(car, (270, 700))
-        for n_y, y_row in enumerate(vs_pred.reshape(70, 61)):
+        window.blit(car, (235, 600))
+        for n_y, y_row in enumerate(vs_pred.reshape(120, 101)):
             for n_x, x in enumerate(y_row):
-                # if x != 0:
-                x = 255 - x*255
+                # if x == 1:
+                x = 255 - x * 255
                 x = max(0, x)
                 x = min(255, x)
 
-                rect = pg.Surface((10, 10))
-                pg.draw.rect(rect, (255, x, x), (0, 0, 10, 10))
-                window.blit(rect, (10*n_x, 690-(10*n_y)))
+                rect = pg.Surface((5, 5))
+                pg.draw.rect(rect, (255, x, x), (0, 0, 5, 5))
+                window.blit(rect, (5 * n_x, 595 - (5 * n_y)))
         pg.display.update()
 
         prev_img_num = img_num

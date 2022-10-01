@@ -5,45 +5,61 @@ import numpy as np
 import cv2
 import pygame as pg
 
-window = pg.display.set_mode((610, 810))
+window = pg.display.set_mode((505, 655))
 pg.init()
 
 # Load data
-arr = np.loadtxt("vstrainingdata/vs_train.csv", delimiter=",")
-vid_arr = arr[:, :36864]
+arr = np.loadtxt("vstrainingdata/vs_train_rough.csv", delimiter=",")
+vid_arr = arr[:, :188928]
 vid_arr = vid_arr.astype("uint8")
-vs_arr = arr[:, 36864:]
+vs_arr = arr[:, 188928:]
+
+vs_blur_arr = np.zeros((1, 120, 101))
+for vs in vs_arr:
+    vs_blur = cv2.GaussianBlur(vs.reshape((120, 101)), (5, 5), 2)
+    vs_blur_arr = np.append(vs_blur_arr, [vs_blur], 0)
+vs_blur_arr = np.delete(vs_blur_arr, 0, 0)
 
 # Init video and vs displays
 img_num = 0
 
-cv2.namedWindow("a", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("a", 512, 384)
+cv2.namedWindow("1", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("1", 512, 384)
+cv2.namedWindow("2", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("2", 704, 576)
+cv2.namedWindow("3", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("3", 704, 576)
 
-# cv2.namedWindow("b", cv2.WINDOW_NORMAL)
-# cv2.resizeWindow("b", 512, 384)
-
-car = pg.Surface((70, 110))
-pg.draw.rect(car, (0, 0, 0), (0, 0, 70, 110))
+car = pg.Surface((35, 55))
 
 while True:
-    # steer = steer_arr[img_num]
-    img = vid_arr[img_num]
-    img = img.reshape(96, 128, 3)
-    cv2.imshow("a", img)
+    images = vid_arr[img_num]
+    img0 = images[0:36864]
+    img0 = img0.reshape(96, 128, 3)
+    img1 = images[36864:112896]
+    img1 = img1.reshape(144, 176, 3)
+    img2 = images[112896:]
+    img2 = img2.reshape(144, 176, 3)
+    cv2.imshow("1", img0)
+    cv2.imshow("2", img1)
+    cv2.imshow("3", img2)
 
     # print(steer, img_num)
-    print(img_num, arr.shape[0], vid_arr.shape[0], vs_arr.shape[0])
+    print(img_num, arr.shape[0], vid_arr.shape[0], vs_blur_arr.shape[0])
 
     # Display vs
     window.fill((255, 255, 255))
-    window.blit(car, (270, 700))
-    for n_y, y_row in enumerate(vs_arr[img_num].reshape(70, 61)):
+    window.blit(car, (235, 600))
+    for n_y, y_row in enumerate(vs_blur_arr[img_num]):
         for n_x, x in enumerate(y_row):
-            if x != 0:
-                rect = pg.Surface((10, 10))
-                pg.draw.rect(rect, (0, 0, 0), (0, 0, 10, 10))
-                window.blit(rect, (10*n_x, 690-(10*n_y)))
+            # if x == 1:
+            x = 255 - x * 255
+            x = max(0, x)
+            x = min(255, x)
+
+            rect = pg.Surface((5, 5))
+            pg.draw.rect(rect, (255, x, x), (0, 0, 5, 5))
+            window.blit(rect, (5 * n_x, 595 - (5 * n_y)))
     pg.display.update()
 
     prev_img_num = img_num
@@ -53,18 +69,18 @@ while True:
         cv2.VideoCapture(0).release()
         break
 
-    time.sleep(0.01)
+    time.sleep(0.05)
     keys = pg.key.get_pressed()
     if keys[pg.K_w]:
         vid_arr = np.delete(vid_arr, img_num, 0)
-        vs_arr = np.delete(vs_arr, img_num, 0)
+        vs_blur_arr = np.delete(vs_blur_arr, img_num, 0)
     if keys[pg.K_a]:
         img_num -= 1
     if keys[pg.K_d]:
         img_num += 1
 
-# with open("vstrainingdata/vs_train_clean.csv", "a") as file:
-#     vid_arr = vid_arr.reshape(-1, 36864)
-#     vs_arr = vs_arr.reshape(-1, 4270)
-#     full = np.concatenate((vid_arr, vs_arr), axis=1)
-#     np.savetxt(file, full, fmt="%.0f", delimiter=",")
+
+with open("vstrainingdata/vs_train_clean.csv", "a") as file:
+    vs_blur_arr = vs_blur_arr.reshape(-1, 12120)
+    full = np.concatenate((vid_arr, vs_blur_arr), axis=1)
+    np.savetxt(file, full, fmt="%.3f", delimiter=",")

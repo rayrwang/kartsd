@@ -183,23 +183,21 @@ vid_arr = vid_arr.astype("uint8")
 prev_img_num = -1
 
 # Labeling progress
-# 1 evens complete
-# 2 evens complete
 
-img_num = 0
+img_num = 257
 
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("1", 512, 384)
 cv2.namedWindow("2", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("2", 512, 384)
+cv2.resizeWindow("2", 704, 576)
 cv2.namedWindow("3", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("3", 512, 384)
+cv2.resizeWindow("3", 704, 576)
 cv2.namedWindow("4", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("4", 512, 384)
+cv2.resizeWindow("4", 256, 192)
 cv2.namedWindow("5", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("5", 512, 384)
+cv2.resizeWindow("5", 352, 288)
 cv2.namedWindow("6", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("6", 512, 384)
+cv2.resizeWindow("6", 352, 288)
 
 cv2.setMouseCallback("1", draw_img0)
 cv2.setMouseCallback("2", draw_img1)
@@ -239,11 +237,11 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
         y = round((y_coord - 2.5) / 5)
 
         if buttons[0]:
-            vs[119 - y, x] = 1
+            vs[119 - y - 1: 119 - y + 2, x - 1: x + 2] = 1
         elif buttons[1]:
-            vs[119 - y - 3: 119 - y + 3, x - 3: x + 3] = 0
+            vs[119 - y - 3: 119 - y + 4, x - 3: x + 4] = 0
         elif buttons[2]:
-            vs[119 - y, x] = 0
+            vs[119 - y, x] = 1
 
         if edge_img_changed:
             cv2.imshow("4", edges_img0)
@@ -254,9 +252,9 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
             # Write previous completed image and vs to file
             if save:
                 img0 = img0.reshape(36864)
-                img1 = img1.reshape(36864)
-                img2 = img2.reshape(36864)
-                vs = vs.reshape(4270)
+                img1 = img1.reshape(76032)
+                img2 = img2.reshape(76032)
+                vs = vs.reshape(12120)
                 full = np.concatenate((img0, img1, img2, vs))
                 np.savetxt(file, [full], fmt="%.0f", delimiter=",")
 
@@ -297,10 +295,15 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
                                        (px_x + 0.3, px_y), (px_x - 0.3, px_y),
                                        (px_x + 0.4, px_y), (px_x - 0.4, px_y),
                                        (px_x + 0.5, px_y), (px_x - 0.5, px_y),
+                                       (px_x, px_y + 0.05), (px_x, px_y - 0.05),
                                        (px_x, px_y + 0.1), (px_x, px_y - 0.1),
+                                       (px_x, px_y + 0.15), (px_x, px_y - 0.15),
                                        (px_x, px_y + 0.2), (px_x, px_y - 0.2),
+                                       (px_x, px_y + 0.25), (px_x, px_y - 0.25),
                                        (px_x, px_y + 0.3), (px_x, px_y - 0.3),
+                                       (px_x, px_y + 0.35), (px_x, px_y - 0.35),
                                        (px_x, px_y + 0.4), (px_x, px_y - 0.4),
+                                       (px_x, px_y + 0.45), (px_x, px_y - 0.45),
                                        (px_x, px_y + 0.5), (px_x, px_y - 0.5),
                                        (px_x + 0.1, px_y + 0.1), (px_x - 0.1, px_y + 0.1),
                                        (px_x + 0.2, px_y + 0.2), (px_x - 0.2, px_y + 0.2),
@@ -316,39 +319,20 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
                 for px_x, pos in enumerate(row):  # px_x : pixels from left (48 to center)
                     if pos == 255:
                         project_right((px_x, px_y),
-                                     (px_x + 0.1, px_y), (px_x - 0.1, px_y),
-                                     (px_x + 0.2, px_y), (px_x - 0.2, px_y),
-                                     (px_x + 0.3, px_y), (px_x - 0.3, px_y),
-                                     (px_x + 0.4, px_y), (px_x - 0.4, px_y),
-                                     (px_x + 0.5, px_y), (px_x - 0.5, px_y),
-                                     (px_x, px_y + 0.1), (px_x, px_y - 0.1),
-                                     (px_x, px_y + 0.2), (px_x, px_y - 0.2),
-                                     (px_x, px_y + 0.3), (px_x, px_y - 0.3),
-                                     (px_x, px_y + 0.4), (px_x, px_y - 0.4),
-                                     (px_x, px_y + 0.5), (px_x, px_y - 0.5),
-                                     (px_x + 0.1, px_y + 0.1), (px_x - 0.1, px_y + 0.1),
-                                     (px_x + 0.2, px_y + 0.2), (px_x - 0.2, px_y + 0.2),
-                                     (px_x + 0.3, px_y + 0.3), (px_x - 0.3, px_y + 0.3),
-                                     (px_x + 0.4, px_y + 0.4), (px_x - 0.4, px_y + 0.4),
-                                     (px_x + 0.5, px_y + 0.5), (px_x - 0.5, px_y + 0.5),
-                                     (px_x - 0.1, px_y - 0.1), (px_x + 0.1, px_y - 0.1),
-                                     (px_x - 0.2, px_y - 0.2), (px_x + 0.2, px_y - 0.2),
-                                     (px_x - 0.3, px_y - 0.3), (px_x + 0.3, px_y - 0.3),
-                                     (px_x - 0.4, px_y - 0.4), (px_x + 0.4, px_y - 0.4),
-                                     (px_x - 0.5, px_y - 0.5), (px_x + 0.5, px_y - 0.5))
-            for px_y, row in enumerate(edges_img2[85:]):  # px_y : pixels below horizon
-                for px_x, pos in enumerate(row):  # px_x : pixels from left (48 to center)
-                    if pos == 255:
-                        project_left((px_x, px_y),
                                       (px_x + 0.1, px_y), (px_x - 0.1, px_y),
                                       (px_x + 0.2, px_y), (px_x - 0.2, px_y),
                                       (px_x + 0.3, px_y), (px_x - 0.3, px_y),
                                       (px_x + 0.4, px_y), (px_x - 0.4, px_y),
                                       (px_x + 0.5, px_y), (px_x - 0.5, px_y),
+                                      (px_x, px_y + 0.05), (px_x, px_y - 0.05),
                                       (px_x, px_y + 0.1), (px_x, px_y - 0.1),
+                                      (px_x, px_y + 0.15), (px_x, px_y - 0.15),
                                       (px_x, px_y + 0.2), (px_x, px_y - 0.2),
+                                      (px_x, px_y + 0.25), (px_x, px_y - 0.25),
                                       (px_x, px_y + 0.3), (px_x, px_y - 0.3),
+                                      (px_x, px_y + 0.35), (px_x, px_y - 0.35),
                                       (px_x, px_y + 0.4), (px_x, px_y - 0.4),
+                                      (px_x, px_y + 0.45), (px_x, px_y - 0.45),
                                       (px_x, px_y + 0.5), (px_x, px_y - 0.5),
                                       (px_x + 0.1, px_y + 0.1), (px_x - 0.1, px_y + 0.1),
                                       (px_x + 0.2, px_y + 0.2), (px_x - 0.2, px_y + 0.2),
@@ -360,16 +344,50 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
                                       (px_x - 0.3, px_y - 0.3), (px_x + 0.3, px_y - 0.3),
                                       (px_x - 0.4, px_y - 0.4), (px_x + 0.4, px_y - 0.4),
                                       (px_x - 0.5, px_y - 0.5), (px_x + 0.5, px_y - 0.5))
+            for px_y, row in enumerate(edges_img2[85:]):  # px_y : pixels below horizon
+                for px_x, pos in enumerate(row):  # px_x : pixels from left (48 to center)
+                    if pos == 255:
+                        project_left((px_x, px_y),
+                                     (px_x + 0.1, px_y), (px_x - 0.1, px_y),
+                                     (px_x + 0.2, px_y), (px_x - 0.2, px_y),
+                                     (px_x + 0.3, px_y), (px_x - 0.3, px_y),
+                                     (px_x + 0.4, px_y), (px_x - 0.4, px_y),
+                                     (px_x + 0.5, px_y), (px_x - 0.5, px_y),
+                                     (px_x, px_y + 0.05), (px_x, px_y - 0.05),
+                                     (px_x, px_y + 0.1), (px_x, px_y - 0.1),
+                                     (px_x, px_y + 0.15), (px_x, px_y - 0.15),
+                                     (px_x, px_y + 0.2), (px_x, px_y - 0.2),
+                                     (px_x, px_y + 0.25), (px_x, px_y - 0.25),
+                                     (px_x, px_y + 0.3), (px_x, px_y - 0.3),
+                                     (px_x, px_y + 0.35), (px_x, px_y - 0.35),
+                                     (px_x, px_y + 0.4), (px_x, px_y - 0.4),
+                                     (px_x, px_y + 0.45), (px_x, px_y - 0.45),
+                                     (px_x, px_y + 0.5), (px_x, px_y - 0.5),
+                                     (px_x + 0.1, px_y + 0.1), (px_x - 0.1, px_y + 0.1),
+                                     (px_x + 0.2, px_y + 0.2), (px_x - 0.2, px_y + 0.2),
+                                     (px_x + 0.3, px_y + 0.3), (px_x - 0.3, px_y + 0.3),
+                                     (px_x + 0.4, px_y + 0.4), (px_x - 0.4, px_y + 0.4),
+                                     (px_x + 0.5, px_y + 0.5), (px_x - 0.5, px_y + 0.5),
+                                     (px_x - 0.1, px_y - 0.1), (px_x + 0.1, px_y - 0.1),
+                                     (px_x - 0.2, px_y - 0.2), (px_x + 0.2, px_y - 0.2),
+                                     (px_x - 0.3, px_y - 0.3), (px_x + 0.3, px_y - 0.3),
+                                     (px_x - 0.4, px_y - 0.4), (px_x + 0.4, px_y - 0.4),
+                                     (px_x - 0.5, px_y - 0.5), (px_x + 0.5, px_y - 0.5))
 
         # Display vs
+        # vs_blur = cv2.GaussianBlur(vs, (9, 9), 0)
         window.fill((255, 255, 255))
         window.blit(car, (235, 600))
         for n_y, y_row in enumerate(vs):
             for n_x, x in enumerate(y_row):
-                if x == 1:
-                    rect = pg.Surface((5, 5))
-                    pg.draw.rect(rect, (0, 0, 0), (0, 0, 10, 10))
-                    window.blit(rect, (5 * n_x, 595 - (5 * n_y)))
+                # if x == 1:
+                x = 255 - x * 255
+                x = max(0, x)
+                x = min(255, x)
+
+                rect = pg.Surface((5, 5))
+                pg.draw.rect(rect, (255, x, x), (0, 0, 5, 5))
+                window.blit(rect, (5 * n_x, 595 - (5 * n_y)))
         pg.display.update()
 
         if cv2.waitKey(1) == ord("f"):
