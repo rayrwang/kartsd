@@ -8,8 +8,8 @@ import pygame as pg
 
 def project_center(*points):
     for point in points:
-        att = math.pi / 180 * 0.38 * (point[1] + 8)  # + difference between index at top of (used portion) of image and horizon
-        azi = math.pi / 180 * 0.38 * (point[0] - 63.5)  # - index at center of image
+        att = math.pi / 180 * 0.19 * (point[1] + 16)  # + difference between index at top of (used portion) of image and horizon
+        azi = math.pi / 180 * 0.19 * (point[0] - 127.5)  # - index at center of image
         dist = 0.7 / math.tan(att)  # dist : distance on ground from camera to px location
         x = dist * math.sin(azi)
         y = dist * math.cos(azi)
@@ -130,7 +130,10 @@ def draw_edge0(event, x, y, *args, **kwargs):
         r_down = False
     elif event == cv2.EVENT_MOUSEMOVE:
         if r_down:
-            edges_img0[y - 5:y + 5, x - 5:x + 5] = 0
+            edges_img0[:, :] = 0
+            edge_img_changed = True
+        elif l_down:
+            edges_img0[y - 5: y + 6, x - 5: x + 6] = 0
             edge_img_changed = True
 
 
@@ -148,7 +151,10 @@ def draw_edge1(event, x, y, *args, **kwargs):
         r_down = False
     elif event == cv2.EVENT_MOUSEMOVE:
         if r_down:
-            edges_img1[y - 5:y + 5, x - 5:x + 5] = 0
+            edges_img1[:, :] = 0
+            edge_img_changed = True
+        elif l_down:
+            edges_img1[y - 5: y + 6, x - 5: x + 6] = 0
             edge_img_changed = True
 
 
@@ -166,34 +172,36 @@ def draw_edge2(event, x, y, *args, **kwargs):
         r_down = False
     elif event == cv2.EVENT_MOUSEMOVE:
         if r_down:
-            edges_img2[y - 5:y + 5, x - 5:x + 5] = 0
+            edges_img2[:, :] = 0
+            edge_img_changed = True
+        elif l_down:
+            edges_img2[y - 5: y + 6, x - 5: x + 6] = 0
             edge_img_changed = True
 
 
 window = pg.display.set_mode((505, 655))
 pg.init()
 
-# Load data
-vid_arr = np.loadtxt("rawvids/three1.csv", dtype="float16", delimiter=",")
-# steer_arr = vid_arr[:, 0]
-# vid_arr = np.delete(vid_arr, 0, axis=1)
-vid_arr = vid_arr.astype("uint8")
-
 # Init video and vs displays
 prev_img_num = -1
 
 # Labeling progress
 
-img_num = 257
+start_img_num = 500
+img_num = 0
+
+# Load data
+vid_arr = np.loadtxt("rawvids/big1.csv", dtype="float16", delimiter=",", skiprows=start_img_num, max_rows=100)
+vid_arr = vid_arr.astype("uint8")
 
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("1", 512, 384)
 cv2.namedWindow("2", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("2", 704, 576)
+cv2.resizeWindow("2", 352, 288)
 cv2.namedWindow("3", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("3", 704, 576)
+cv2.resizeWindow("3", 352, 288)
 cv2.namedWindow("4", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("4", 256, 192)
+cv2.resizeWindow("4", 512, 384)
 cv2.namedWindow("5", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("5", 352, 288)
 cv2.namedWindow("6", cv2.WINDOW_NORMAL)
@@ -251,7 +259,7 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
         if img_num != prev_img_num:
             # Write previous completed image and vs to file
             if save:
-                img0 = img0.reshape(36864)
+                img0 = img0.reshape(147456)
                 img1 = img1.reshape(76032)
                 img2 = img2.reshape(76032)
                 vs = vs.reshape(12120)
@@ -259,26 +267,25 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
                 np.savetxt(file, [full], fmt="%.0f", delimiter=",")
 
             # Get new image
-            # steer = steer_arr[img_num]
             images = vid_arr[img_num]
-            img0 = images[0:36864]
-            img0 = img0.reshape(96, 128, 3)
-            img1 = images[36864:112896]
+            img0 = images[:147456]
+            img0 = img0.reshape(192, 256, 3)
+            img1 = images[147456:223488]
             img1 = img1.reshape(144, 176, 3)
-            img2 = images[112896:]
+            img2 = images[223488:]
             img2 = img2.reshape(144, 176, 3)
             cv2.imshow("1", img0)
             cv2.imshow("2", img1)
             cv2.imshow("3", img2)
 
             # Compute edges
-            edges_img0 = cv2.Canny(img0, 999999, 999999, apertureSize=7, L2gradient=True)
+            edges_img0 = cv2.Canny(img0, 15000, 25000, apertureSize=7, L2gradient=True)
             cv2.imshow("4", edges_img0)
-            edges_img1 = cv2.Canny(img1, 999999, 999999, apertureSize=7, L2gradient=True)
+            edges_img1 = cv2.Canny(img1, 15000, 25000, apertureSize=7, L2gradient=True)
             cv2.imshow("5", edges_img1)
-            edges_img2 = cv2.Canny(img2, 999999, 999999, apertureSize=7, L2gradient=True)
+            edges_img2 = cv2.Canny(img2, 15000, 25000, apertureSize=7, L2gradient=True)
             cv2.imshow("6", edges_img2)
-            print(img_num, vid_arr.shape[0])
+            print(start_img_num + img_num, start_img_num + vid_arr.shape[0])
 
         if img_num != prev_img_num or edge_img_changed:
             edge_img_changed = False
@@ -286,7 +293,7 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
 
             # Compute physical x and y for pixels in edges
             vs = np.zeros((120, 101))  # rows, columns
-            for px_y, row in enumerate(edges_img0[25:]):  # px_y : pixels below horizon
+            for px_y, row in enumerate(edges_img0[50:]):  # px_y : pixels below horizon
                 for px_x, pos in enumerate(row):  # px_x : pixels from left (48 to center)
                     if pos == 255:
                         project_center((px_x, px_y),
@@ -380,7 +387,6 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
         window.blit(car, (235, 600))
         for n_y, y_row in enumerate(vs):
             for n_x, x in enumerate(y_row):
-                # if x == 1:
                 x = 255 - x * 255
                 x = max(0, x)
                 x = min(255, x)

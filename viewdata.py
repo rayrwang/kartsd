@@ -10,13 +10,14 @@ pg.init()
 
 # Load data
 arr = np.loadtxt("vstrainingdata/vs_train_rough.csv", delimiter=",")
-vid_arr = arr[:, :188928]
+vid_arr = arr[:, :299520]
 vid_arr = vid_arr.astype("uint8")
-vs_arr = arr[:, 188928:]
+vs_arr = arr[:, 299520:]
 
 vs_blur_arr = np.zeros((1, 120, 101))
 for vs in vs_arr:
-    vs_blur = cv2.GaussianBlur(vs.reshape((120, 101)), (5, 5), 2)
+    # vs_blur = cv2.GaussianBlur(vs.reshape((120, 101)), (7, 7), 2)
+    vs_blur = vs.reshape((120, 101))
     vs_blur_arr = np.append(vs_blur_arr, [vs_blur], 0)
 vs_blur_arr = np.delete(vs_blur_arr, 0, 0)
 
@@ -26,19 +27,19 @@ img_num = 0
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("1", 512, 384)
 cv2.namedWindow("2", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("2", 704, 576)
+cv2.resizeWindow("2", 352, 288)
 cv2.namedWindow("3", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("3", 704, 576)
+cv2.resizeWindow("3", 352, 288)
 
 car = pg.Surface((35, 55))
 
 while True:
     images = vid_arr[img_num]
-    img0 = images[0:36864]
-    img0 = img0.reshape(96, 128, 3)
-    img1 = images[36864:112896]
+    img0 = images[:147456]
+    img0 = img0.reshape(192, 256, 3)
+    img1 = images[147456:223488]
     img1 = img1.reshape(144, 176, 3)
-    img2 = images[112896:]
+    img2 = images[223488:]
     img2 = img2.reshape(144, 176, 3)
     cv2.imshow("1", img0)
     cv2.imshow("2", img1)
@@ -52,7 +53,6 @@ while True:
     window.blit(car, (235, 600))
     for n_y, y_row in enumerate(vs_blur_arr[img_num]):
         for n_x, x in enumerate(y_row):
-            # if x == 1:
             x = 255 - x * 255
             x = max(0, x)
             x = min(255, x)
@@ -80,7 +80,7 @@ while True:
         img_num += 1
 
 
-with open("vstrainingdata/vs_train_clean.csv", "a") as file:
-    vs_blur_arr = vs_blur_arr.reshape(-1, 12120)
-    full = np.concatenate((vid_arr, vs_blur_arr), axis=1)
-    np.savetxt(file, full, fmt="%.3f", delimiter=",")
+# with open("vstrainingdata/vs_train_clean.csv", "a") as file:
+#     vs_blur_arr = vs_blur_arr.reshape(-1, 12120)
+#     full = np.concatenate((vid_arr, vs_blur_arr), axis=1)
+#     np.savetxt(file, full, fmt="%.3f", delimiter=",")

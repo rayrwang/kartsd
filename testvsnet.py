@@ -13,10 +13,9 @@ window = pg.display.set_mode((505, 655))
 pg.init()
 
 # Load data
-arr = np.loadtxt("rawvids/three1.csv", dtype="float16", delimiter=",")
-vid_arr = arr[:, :188928]
+arr = np.loadtxt("rawvids/big1.csv", dtype="float16", delimiter=",", max_rows=None)
+vid_arr = arr[:, :299520]
 vid_arr = vid_arr.astype("uint8")
-data = np.loadtxt("vstrainingdata/vs_train.csv", dtype="float32", delimiter=",")
 
 # Init video and vs displays
 img_num = 0
@@ -25,9 +24,9 @@ prev_img_num = -1
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("1", 512, 384)
 cv2.namedWindow("2", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("2", 704, 576)
+cv2.resizeWindow("2", 352, 288)
 cv2.namedWindow("3", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("3", 704, 576)
+cv2.resizeWindow("3", 352, 288)
 
 car = pg.Surface((35, 55))
 
@@ -39,16 +38,16 @@ model.eval()
 while True:
     if img_num != prev_img_num:
         images = vid_arr[img_num]
-        img0 = images[0:36864]
-        img0 = img0.reshape(96, 128, 3)
-        img1 = images[36864:112896]
+        img0 = images[:147456]
+        img0 = img0.reshape(192, 256, 3)
+        img1 = images[147456:223488]
         img1 = img1.reshape(144, 176, 3)
-        img2 = images[112896:]
+        img2 = images[223488:299520]
         img2 = img2.reshape(144, 176, 3)
         cv2.imshow("1", img0)
         cv2.imshow("2", img1)
         cv2.imshow("3", img2)
-        img0 = img0[25:, :, :]
+        img0 = img0[50:, :, :]
         img1 = img1[85:, :, :]
         img2 = img2[85:, :, :]
 
@@ -70,7 +69,6 @@ while True:
         x2 = torch.swapaxes(x2, 1, 3)
         x2 = torch.swapaxes(x2, 2, 3)
         x2 = x2.to(device)
-        print(x0.shape, x1.shape, x2.shape)
         vs_pred = model(x0, x1, x2)
 
         # Display vs

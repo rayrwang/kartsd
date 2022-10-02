@@ -8,27 +8,27 @@ from network import VSNet
 
 class TrainingData(Dataset):
     def __init__(self):
-        data = np.loadtxt("vstrainingdata/vs_train.csv", dtype="float32", delimiter=",")
+        data = np.loadtxt("vstrainingdata/vs_train_rough.csv", dtype="float32", delimiter=",", max_rows=None)
 
-        self.x1 = torch.from_numpy(data[:, :36864])
-        self.x1 = torch.reshape(self.x1, (-1, 96, 128, 3))
-        self.x1 = self.x1[:, 25:, :, :]
+        self.x1 = torch.from_numpy(data[:, :147456])
+        self.x1 = torch.reshape(self.x1, (-1, 192, 256, 3))
+        self.x1 = self.x1[:, 50:, :, :]
         self.x1 = torch.swapaxes(self.x1, 1, 3)
         self.x1 = torch.swapaxes(self.x1, 2, 3)
 
-        self.x2 = torch.from_numpy(data[:, 36864:112896])
+        self.x2 = torch.from_numpy(data[:, 147456:223488])
         self.x2 = torch.reshape(self.x2, (-1, 144, 176, 3))
         self.x2 = self.x2[:, 85:, :, :]
         self.x2 = torch.swapaxes(self.x2, 1, 3)
         self.x2 = torch.swapaxes(self.x2, 2, 3)
 
-        self.x3 = torch.from_numpy(data[:, 112896:188928])
+        self.x3 = torch.from_numpy(data[:, 223488:299520])
         self.x3 = torch.reshape(self.x3, (-1, 144, 176, 3))
         self.x3 = self.x3[:, 85:, :, :]
         self.x3 = torch.swapaxes(self.x3, 1, 3)
         self.x3 = torch.swapaxes(self.x3, 2, 3)
 
-        self.y = torch.from_numpy(data[:, 188928:])
+        self.y = torch.from_numpy(data[:, 299520:])
 
         self.n_samples = data.shape[0]
 
