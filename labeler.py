@@ -8,9 +8,12 @@ import pygame as pg
 
 def project_center(*points):
     for point in points:
-        att = math.pi / 180 * 0.19 * (point[1] + 16)  # + difference between index at top of (used portion) of image and horizon
+        att = math.pi / 180 * 0.19 * (point[1] + 0)  # + difference between index at top of (used portion) of image and horizon
         azi = math.pi / 180 * 0.19 * (point[0] - 127.5)  # - index at center of image
-        dist = 0.7 / math.tan(att)  # dist : distance on ground from camera to px location
+        try:
+            dist = 0.7 / math.tan(att)  # dist : distance on ground from camera to px location
+        except:
+            return
         x = dist * math.sin(azi)
         y = dist * math.cos(azi)
 
@@ -187,11 +190,11 @@ prev_img_num = -1
 
 # Labeling progress
 
-start_img_num = 500
+start_img_num = 0
 img_num = 0
 
 # Load data
-vid_arr = np.loadtxt("rawvids/big1.csv", dtype="float16", delimiter=",", skiprows=start_img_num, max_rows=100)
+vid_arr = np.loadtxt("rawvids/big2.csv", dtype="float16", delimiter=",", skiprows=start_img_num, max_rows=100)
 vid_arr = vid_arr.astype("uint8")
 
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
@@ -293,7 +296,7 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
 
             # Compute physical x and y for pixels in edges
             vs = np.zeros((120, 101))  # rows, columns
-            for px_y, row in enumerate(edges_img0[50:]):  # px_y : pixels below horizon
+            for px_y, row in enumerate(edges_img0[34:]):  # px_y : pixels below horizon
                 for px_x, pos in enumerate(row):  # px_x : pixels from left (48 to center)
                     if pos == 255:
                         project_center((px_x, px_y),

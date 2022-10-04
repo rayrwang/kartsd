@@ -13,7 +13,7 @@ window = pg.display.set_mode((505, 655))
 pg.init()
 
 # Load data
-arr = np.loadtxt("rawvids/big1.csv", dtype="float16", delimiter=",", max_rows=None)
+arr = np.loadtxt("rawvids/big2.csv", dtype="float16", delimiter=",", max_rows=50)
 vid_arr = arr[:, :299520]
 vid_arr = vid_arr.astype("uint8")
 
@@ -27,12 +27,18 @@ cv2.namedWindow("2", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("2", 352, 288)
 cv2.namedWindow("3", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("3", 352, 288)
+cv2.namedWindow("4", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("4", 512, 284)
+cv2.namedWindow("5", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("5", 352, 118)
+cv2.namedWindow("6", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("6", 352, 118)
 
 car = pg.Surface((35, 55))
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/vs.pth", map_location=device))
+model.load_state_dict(torch.load("models/vs100.pth", map_location=device))
 
 model.eval()
 while True:
@@ -50,6 +56,9 @@ while True:
         img0 = img0[50:, :, :]
         img1 = img1[85:, :, :]
         img2 = img2[85:, :, :]
+        cv2.imshow("4", img0)
+        cv2.imshow("5", img1)
+        cv2.imshow("6", img2)
 
         # Test inference
         img0 = img0.astype("float32")
@@ -76,7 +85,6 @@ while True:
         window.blit(car, (235, 600))
         for n_y, y_row in enumerate(vs_pred.reshape(120, 101)):
             for n_x, x in enumerate(y_row):
-                # if x == 1:
                 x = 255 - x * 255
                 x = max(0, x)
                 x = min(255, x)
@@ -95,6 +103,6 @@ while True:
 
     keys = pg.key.get_pressed()
     if keys[pg.K_a]:
-        img_num -= 5
+        img_num -= 1
     if keys[pg.K_d]:
-        img_num += 5
+        img_num += 1

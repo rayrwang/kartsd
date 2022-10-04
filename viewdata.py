@@ -9,15 +9,15 @@ window = pg.display.set_mode((505, 655))
 pg.init()
 
 # Load data
-arr = np.loadtxt("vstrainingdata/vs_train_rough.csv", delimiter=",")
+arr = np.loadtxt("vstrainingdata/vs_train_rough.csv", delimiter=",", dtype="float32", max_rows=None)
 vid_arr = arr[:, :299520]
 vid_arr = vid_arr.astype("uint8")
 vs_arr = arr[:, 299520:]
 
 vs_blur_arr = np.zeros((1, 120, 101))
 for vs in vs_arr:
-    # vs_blur = cv2.GaussianBlur(vs.reshape((120, 101)), (7, 7), 2)
-    vs_blur = vs.reshape((120, 101))
+    vs_blur = cv2.GaussianBlur(vs.reshape((120, 101)), (7, 7), 1)
+    # vs_blur = vs.reshape((120, 101))
     vs_blur_arr = np.append(vs_blur_arr, [vs_blur], 0)
 vs_blur_arr = np.delete(vs_blur_arr, 0, 0)
 
@@ -80,7 +80,7 @@ while True:
         img_num += 1
 
 
-# with open("vstrainingdata/vs_train_clean.csv", "a") as file:
-#     vs_blur_arr = vs_blur_arr.reshape(-1, 12120)
-#     full = np.concatenate((vid_arr, vs_blur_arr), axis=1)
-#     np.savetxt(file, full, fmt="%.3f", delimiter=",")
+with open("vstrainingdata/vs_train_clean.csv", "a") as file:
+    vs_blur_arr = vs_blur_arr.reshape(-1, 12120)
+    full = np.concatenate((vid_arr, vs_blur_arr), axis=1)
+    np.savetxt(file, full, fmt="%.3f", delimiter=",")

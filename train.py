@@ -8,7 +8,7 @@ from network import VSNet
 
 class TrainingData(Dataset):
     def __init__(self):
-        data = np.loadtxt("vstrainingdata/vs_train_rough.csv", dtype="float32", delimiter=",", max_rows=None)
+        data = np.loadtxt("vstrainingdata/vs_train_clean.csv", dtype="float32", delimiter=",", max_rows=None)
 
         self.x1 = torch.from_numpy(data[:, :147456])
         self.x1 = torch.reshape(self.x1, (-1, 192, 256, 3))
@@ -43,7 +43,7 @@ dataset = TrainingData()
 train_size = round(0.8*len(dataset))
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = torch.utils.data.random_split(dataset, (train_size, test_size))
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=len(train_dataset), shuffle=True)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=100, shuffle=True)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=len(test_dataset))
 
 device = torch.device("cuda")
@@ -66,7 +66,9 @@ for epoch in range(100):
         loss.backward()
         optimizer.step()
 
-        print(f"Epoch {epoch}, Step {step}, Loss:{loss.item() : .4f}")
+        print(f"Epoch {epoch+1}, Step {step}, Loss:{loss.item() : .4f}")
+        if (epoch+1) % 25 == 0:
+            torch.save(model.state_dict(), f"models/vs{epoch+1}.pth")
 
 # Test
 with torch.no_grad():
@@ -80,5 +82,3 @@ with torch.no_grad():
         loss = criterion(outputs, labels)
 
         print(loss)
-
-torch.save(model.state_dict(), "models/vs.pth")
