@@ -50,7 +50,7 @@ device = torch.device("cuda")
 
 model = VSNet().to(device)
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters())
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 # scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.9)
 
 norm1 = torch.nn.BatchNorm2d(3)
@@ -58,6 +58,7 @@ norm1 = norm1.to(device)
 for epoch in range(1000):
     if (epoch + 1) % 25 == 0:
         torch.save(model.state_dict(), f"models/vs{epoch + 1}.pth")
+    model.train()
     for step, (x1, x2, x3, labels) in enumerate(train_dataloader):
         x1 = x1.to(device)
         x2 = x2.to(device)
@@ -76,6 +77,7 @@ for epoch in range(1000):
         optimizer.step()
 
         with torch.no_grad():
+            model.eval()
             for x1, x2, x3, labels in test_dataloader:
                 x1 = x1.to(device)
                 x2 = x2.to(device)
