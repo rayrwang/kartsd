@@ -9,15 +9,15 @@ window = pg.display.set_mode((505, 655))
 pg.init()
 
 # Load data
-arr = np.loadtxt("vstrainingdata/vs_train_rough.csv", delimiter=",", dtype="float32", max_rows=None)
+arr = np.loadtxt("vstrainingdata/vs_train_clean.csv", delimiter=",", dtype="float32", max_rows=10)
 vid_arr = arr[:, :299520]
 vid_arr = vid_arr.astype("uint8")
 vs_arr = arr[:, 299520:]
 
 vs_blur_arr = np.zeros((1, 120, 101))
 for vs in vs_arr:
-    vs_blur = cv2.GaussianBlur(vs.reshape((120, 101)), (7, 7), 1)
-    # vs_blur = vs.reshape((120, 101))
+    # vs_blur = cv2.GaussianBlur(vs.reshape((120, 101)), (25, 25), 1)
+    vs_blur = vs.reshape((120, 101))
     vs_blur_arr = np.append(vs_blur_arr, [vs_blur], 0)
 vs_blur_arr = np.delete(vs_blur_arr, 0, 0)
 

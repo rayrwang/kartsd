@@ -13,7 +13,7 @@ window = pg.display.set_mode((505, 655))
 pg.init()
 
 # Load data
-arr = np.loadtxt("rawvids/big2.csv", dtype="float16", delimiter=",", max_rows=50)
+arr = np.loadtxt("rawvids/big2.csv", dtype="float16", delimiter=",", max_rows=100)
 vid_arr = arr[:, :299520]
 vid_arr = vid_arr.astype("uint8")
 
@@ -41,6 +41,8 @@ model = VSNet().to(device)
 model.load_state_dict(torch.load("models/vs100.pth", map_location=device))
 
 model.eval()
+norm1 = torch.nn.BatchNorm2d(3)
+norm1 = norm1.to(device)
 while True:
     if img_num != prev_img_num:
         images = vid_arr[img_num]
@@ -78,6 +80,9 @@ while True:
         x2 = torch.swapaxes(x2, 1, 3)
         x2 = torch.swapaxes(x2, 2, 3)
         x2 = x2.to(device)
+        x0 = norm1(x0)
+        x1 = norm1(x1)
+        x2 = norm1(x2)
         vs_pred = model(x0, x1, x2)
 
         # Display vs
