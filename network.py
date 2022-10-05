@@ -37,17 +37,23 @@ class VSNet(nn.Module):
         self.r1 = nn.ModuleDict(dict(
             pool=nn.MaxPool2d(kernel_size=2, stride=2),
             conv1=nn.Conv2d(3, 10, kernel_size=7, stride=(1, 2)),
+            bn1=nn.BatchNorm2d(10),
             conv2=nn.Conv2d(10, 20, kernel_size=5, stride=1),
+            bn2=nn.BatchNorm2d(20),
             conv3=nn.Conv2d(20, 20, kernel_size=3, stride=1),
             conv4=nn.Conv2d(20, 40, kernel_size=3, stride=1),
+            bn3=nn.BatchNorm2d(40),
             act=nn.ReLU()
         ))
         self.r2 = nn.ModuleDict(dict(
             pool=nn.MaxPool2d(kernel_size=2, stride=2),
             conv1=nn.Conv2d(3, 10, kernel_size=(5, 7), stride=(1, 2)),
+            bn1=nn.BatchNorm2d(10),
             conv2=nn.Conv2d(10, 20, kernel_size=(3, 5), stride=1),
+            bn2=nn.BatchNorm2d(20),
             conv3=nn.Conv2d(20, 20, kernel_size=3, stride=1),
             conv4=nn.Conv2d(20, 40, kernel_size=3, stride=1),
+            bn3=nn.BatchNorm2d(40),
             act=nn.ReLU()
         ))
         self.r3 = self.r2
@@ -57,26 +63,26 @@ class VSNet(nn.Module):
         r2 = self.r2
         r3 = self.r3
 
-        x1 = r1.pool(F.relu(r1.conv1(x1)))
-        x1 = r1.pool(F.relu(r1.conv2(x1)))
-        x1 = r1.pool(F.relu(r1.conv3(x1)))
-        x1 = r1.pool(F.relu(r1.conv4(x1)))
+        x1 = F.relu(r1.bn1(r1.pool(r1.conv1(x1))))
+        x1 = F.relu(r1.bn2(r1.pool(r1.conv2(x1))))
+        x1 = F.relu(r1.bn2(r1.pool(r1.conv3(x1))))
+        x1 = F.relu(r1.bn3(r1.pool(r1.conv4(x1))))
         # print(x1.shape)
         x1 = x1.reshape(-1, 1200)
         # print(x1.shape)
 
-        x2 = r2.pool(F.relu(r2.conv1(x2)))
-        x2 = r2.pool(F.relu(r2.conv2(x2)))
-        x2 = F.relu(r2.conv3(x2))
-        x2 = r2.pool(F.relu(r2.conv4(x2)))
+        x2 = F.relu(r2.bn1(r2.pool(r2.conv1(x2))))
+        x2 = F.relu(r2.bn2(r2.pool(r2.conv2(x2))))
+        x2 = F.relu(r2.bn2(r2.conv3(x2)))
+        x2 = F.relu(r2.bn3(r2.pool(r2.conv4(x2))))
         # print(x2.shape)
         x2 = x2.reshape(-1, 1120)
         # print(x2.shape)
 
-        x3 = r3.pool(F.relu(r3.conv1(x3)))
-        x3 = r3.pool(F.relu(r3.conv2(x3)))
-        x3 = F.relu(r3.conv3(x3))
-        x3 = r3.pool(F.relu(r3.conv4(x3)))
+        x3 = F.relu(r3.bn1(r3.pool(r3.conv1(x3))))
+        x3 = F.relu(r3.bn2(r3.pool(r3.conv2(x3))))
+        x3 = F.relu(r3.bn2(r3.conv3(x3)))
+        x3 = F.relu(r3.bn3(r3.pool(r3.conv4(x3))))
         # print(x3.shape)
         x3 = x3.reshape(-1, 1120)
         # print(x3.shape)
