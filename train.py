@@ -91,16 +91,3 @@ for epoch in range(1000):
         print(f"Epoch {epoch+1}, Step {step+1}, "
               f"Train loss:{train_loss.item() : .4f}, Test loss:{test_loss.item() : .4f}")
     # scheduler.step()
-
-# Test
-with torch.no_grad():
-    for x1, x2, x3, labels in test_dataloader:
-        x1 = x1.to(device)
-        x2 = x2.to(device)
-        x3 = x3.to(device)
-        labels = labels.to(device)
-
-        outputs = model(x1, x2, x3)
-        loss = criterion(outputs, labels)
-
-        print(loss)
