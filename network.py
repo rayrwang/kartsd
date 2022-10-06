@@ -30,9 +30,9 @@ class VSNet(nn.Module):
         super().__init__()
 
         self.dropout = nn.Dropout(p=0.5)
-        self.bn1 = nn.BatchNorm1d(9472)
-        self.fc1 = nn.Linear(9472, 9472)
-        self.fc2 = nn.Linear(9472, 12120)
+        self.bn1 = nn.BatchNorm1d(1000)
+        self.fc1 = nn.Linear(9472, 1000)
+        self.fc2 = nn.Linear(1000, 12120)
 
         # Backbone and FPNs
         self.n1 = nn.ModuleDict(dict(
