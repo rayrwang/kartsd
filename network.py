@@ -202,6 +202,7 @@ class VSNet(nn.Module):
         x3 = torch.cat((p4, p3, p2, p1), dim=1)
 
         x = torch.cat((x1, x2, x3), dim=1)
+        # TODO Use transformer for decoding
         x = F.relu(self.fc1(x))
         x = self.dropout(x)
         x = F.relu(self.fc2(x))
