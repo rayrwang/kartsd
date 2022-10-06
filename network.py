@@ -35,10 +35,17 @@ class VSNet(nn.Module):
 
         # Backbone and FPNs
         self.n1 = nn.ModuleDict(dict(
-            conv1=nn.Conv2d(3, 16, kernel_size=(3, 5), stride=(3, 4), padding=1),
-            conv2=nn.Conv2d(16, 32, kernel_size=2, stride=2),
-            conv3=nn.Conv2d(32, 64, kernel_size=2, stride=2),
-            conv4=nn.Conv2d(64, 128, kernel_size=2, stride=2),
+            conv1=nn.Conv2d(3, 16, kernel_size=(3, 5), stride=(3, 4), padding=1, bias=False),
+            pool=nn.MaxPool2d(kernel_size=2, stride=2),
+            skip1=nn.Conv2d(16, 32, kernel_size=1, stride=1, bias=False),
+            conv2=nn.Conv2d(16, 32, kernel_size=2, stride=2, bias=False),
+            conv3=nn.Conv2d(32, 32, kernel_size=3, stride=1, padding="same", bias=False),
+            skip2=nn.Conv2d(32, 64, kernel_size=1, stride=1, bias=False),
+            conv4=nn.Conv2d(32, 64, kernel_size=2, stride=2, bias=False),
+            conv5=nn.Conv2d(64, 64, kernel_size=3, stride=1, padding="same", bias=False),
+            skip3=nn.Conv2d(64, 128, kernel_size=1, stride=1, bias=False),
+            conv6=nn.Conv2d(64, 128, kernel_size=2, stride=2, bias=False),
+            conv7=nn.Conv2d(128, 128, kernel_size=3, stride=1, padding="same", bias=False),
             lateral1=nn.Conv2d(16, 16, 1, bias=False),
             lateral2=nn.Conv2d(32, 32, 1, bias=False),
             lateral3=nn.Conv2d(64, 64, 1, bias=False),
@@ -47,17 +54,24 @@ class VSNet(nn.Module):
             down1=nn.Conv2d(128, 64, 1, bias=False),
             down2=nn.Conv2d(64, 32, 1, bias=False),
             down3=nn.Conv2d(32, 16, 1, bias=False),
-            outconv1=nn.Conv2d(128, 64, kernel_size=3, stride=3),
-            outconv2=nn.Conv2d(64, 32, kernel_size=3, stride=3),
-            outconv3=nn.Conv2d(32, 16, kernel_size=3, stride=3),
-            outconv4=nn.Conv2d(16, 8, kernel_size=3, stride=3),
+            outconv1=nn.Conv2d(128, 64, kernel_size=3, stride=3, bias=False),
+            outconv2=nn.Conv2d(64, 32, kernel_size=3, stride=3, bias=False),
+            outconv3=nn.Conv2d(32, 16, kernel_size=3, stride=3, bias=False),
+            outconv4=nn.Conv2d(16, 8, kernel_size=3, stride=3, bias=False),
             act=nn.ReLU()
         ))
         self.n2 = nn.ModuleDict(dict(
-            conv1=nn.Conv2d(3, 16, kernel_size=(3, 4), stride=(2, 4), padding=(3, 8)),
-            conv2=nn.Conv2d(16, 32, kernel_size=2, stride=2),
-            conv3=nn.Conv2d(32, 64, kernel_size=2, stride=2),
-            conv4=nn.Conv2d(64, 128, kernel_size=2, stride=2),
+            conv1=nn.Conv2d(3, 16, kernel_size=(3, 4), stride=(2, 4), padding=(3, 8), bias=False),
+            pool=nn.MaxPool2d(kernel_size=2, stride=2),
+            skip1=nn.Conv2d(16, 32, kernel_size=1, stride=1, bias=False),
+            conv2=nn.Conv2d(16, 32, kernel_size=2, stride=2, bias=False),
+            conv3=nn.Conv2d(32, 32, kernel_size=3, stride=1, padding="same", bias=False),
+            skip2=nn.Conv2d(32, 64, kernel_size=1, stride=1, bias=False),
+            conv4=nn.Conv2d(32, 64, kernel_size=2, stride=2, bias=False),
+            conv5=nn.Conv2d(64, 64, kernel_size=3, stride=1, padding="same", bias=False),
+            skip3=nn.Conv2d(64, 128, kernel_size=1, stride=1, bias=False),
+            conv6=nn.Conv2d(64, 128, kernel_size=2, stride=2, bias=False),
+            conv7=nn.Conv2d(128, 128, kernel_size=3, stride=1, padding="same", bias=False),
             lateral1=nn.Conv2d(16, 16, 1, bias=False),
             lateral2=nn.Conv2d(32, 32, 1, bias=False),
             lateral3=nn.Conv2d(64, 64, 1, bias=False),
@@ -66,10 +80,10 @@ class VSNet(nn.Module):
             down1=nn.Conv2d(128, 64, 1, bias=False),
             down2=nn.Conv2d(64, 32, 1, bias=False),
             down3=nn.Conv2d(32, 16, 1, bias=False),
-            outconv1=nn.Conv2d(128, 64, kernel_size=3, stride=3),
-            outconv2=nn.Conv2d(64, 32, kernel_size=3, stride=3),
-            outconv3=nn.Conv2d(32, 16, kernel_size=3, stride=3),
-            outconv4=nn.Conv2d(16, 8, kernel_size=3, stride=3),
+            outconv1=nn.Conv2d(128, 64, kernel_size=3, stride=3, bias=False),
+            outconv2=nn.Conv2d(64, 32, kernel_size=3, stride=3, bias=False),
+            outconv3=nn.Conv2d(32, 16, kernel_size=3, stride=3, bias=False),
+            outconv4=nn.Conv2d(16, 8, kernel_size=3, stride=3, bias=False),
             act=nn.ReLU()
         ))
         self.n3 = self.n2
@@ -82,13 +96,22 @@ class VSNet(nn.Module):
         x1 = n1.act(n1.conv1(x1))
         c1 = x1.clone()
         # print(x1.shape)
+        skip = n1.skip1(n1.pool(x1.clone()))
         x1 = n1.act(n1.conv2(x1))
+        x1 = n1.act(n1.conv3(x1))
+        x1 = n1.act(n1.conv3(x1) + skip)
         c2 = x1.clone()
         # print(x1.shape)
-        x1 = n1.act(n1.conv3(x1))
+        skip = n1.skip2(n1.pool(x1.clone()))
+        x1 = n1.act(n1.conv4(x1))
+        x1 = n1.act(n1.conv5(x1))
+        x1 = n1.act(n1.conv5(x1) + skip)
         c3 = x1.clone()
         # print(x1.shape)
-        x1 = n1.act(n1.conv4(x1))
+        skip = n1.skip3(n1.pool(x1.clone()))
+        x1 = n1.act(n1.conv6(x1))
+        x1 = n1.act(n1.conv7(x1))
+        x1 = n1.act(n1.conv7(x1) + skip)
         c4 = x1.clone()
         # print(x1.shape)
         m4 = n1.act(n1.lateral4(c4))
@@ -109,13 +132,22 @@ class VSNet(nn.Module):
         x2 = n2.act(n2.conv1(x2))
         c1 = x2.clone()
         # print(x2.shape)
+        skip = n2.skip1(n2.pool(x2.clone()))
         x2 = n2.act(n2.conv2(x2))
+        x2 = n2.act(n2.conv3(x2))
+        x2 = n2.act(n2.conv3(x2) + skip)
         c2 = x2.clone()
         # print(x2.shape)
-        x2 = n2.act(n2.conv3(x2))
+        skip = n2.skip2(n2.pool(x2.clone()))
+        x2 = n2.act(n2.conv4(x2))
+        x2 = n2.act(n2.conv5(x2))
+        x2 = n2.act(n2.conv5(x2) + skip)
         c3 = x2.clone()
         # print(x2.shape)
-        x2 = n2.act(n2.conv4(x2))
+        skip = n2.skip3(n2.pool(x2.clone()))
+        x2 = n2.act(n2.conv6(x2))
+        x2 = n2.act(n2.conv7(x2))
+        x2 = n2.act(n2.conv7(x2) + skip)
         c4 = x2.clone()
         # print(x2.shape)
         m4 = n2.act(n2.lateral4(c4))
@@ -136,13 +168,22 @@ class VSNet(nn.Module):
         x3 = n3.act(n3.conv1(x3))
         c1 = x3.clone()
         # print(x3.shape)
+        skip = n3.skip1(n3.pool(x3.clone()))
         x3 = n3.act(n3.conv2(x3))
+        x3 = n3.act(n3.conv3(x3))
+        x3 = n3.act(n3.conv3(x3) + skip)
         c2 = x3.clone()
         # print(x3.shape)
-        x3 = n3.act(n3.conv3(x3))
+        skip = n3.skip2(n3.pool(x3.clone()))
+        x3 = n3.act(n3.conv4(x3))
+        x3 = n3.act(n3.conv5(x3))
+        x3 = n3.act(n3.conv5(x3) + skip)
         c3 = x3.clone()
         # print(x3.shape)
-        x3 = n3.act(n3.conv4(x3))
+        skip = n3.skip3(n3.pool(x3.clone()))
+        x3 = n3.act(n3.conv6(x3))
+        x3 = n3.act(n3.conv7(x3))
+        x3 = n3.act(n3.conv7(x3) + skip)
         c4 = x3.clone()
         # print(x3.shape)
         m4 = n3.act(n3.lateral4(c4))

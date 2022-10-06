@@ -38,7 +38,7 @@ car = pg.Surface((35, 55))
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/vs300.pth", map_location=device))
+model.load_state_dict(torch.load("models/vs975.pth", map_location=device))
 
 model.eval()
 norm1 = torch.nn.BatchNorm2d(3)
