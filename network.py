@@ -30,7 +30,6 @@ class VSNet(nn.Module):
         super().__init__()
 
         self.dropout = nn.Dropout(p=0.5)
-        self.bn1 = nn.BatchNorm1d(1000)
         self.fc1 = nn.Linear(9472, 1000)
         self.fc2 = nn.Linear(1000, 12120)
 
@@ -204,7 +203,7 @@ class VSNet(nn.Module):
 
         x = torch.cat((x1, x2, x3), dim=1)
         x = F.relu(self.fc1(x))
-        x = self.bn1(self.dropout(x))
+        x = self.dropout(x)
         x = F.relu(self.fc2(x))
 
         return x
