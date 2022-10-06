@@ -6,7 +6,7 @@ import cv2
 import pygame as pg
 import torch
 
-from network import VSNet
+from networks import VSNet
 
 
 window = pg.display.set_mode((505, 655))
@@ -38,7 +38,7 @@ car = pg.Surface((35, 55))
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/vs400.pth", map_location=device))
+model.load_state_dict(torch.load("models/vs100.pth", map_location=device))
 
 model.eval()
 norm1 = torch.nn.BatchNorm2d(3)

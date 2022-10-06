@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 
-from network import VSNet
+from networks import VSNet
 
 
 class TrainingData(Dataset):

@@ -9,7 +9,7 @@ import cv2
 import torch
 
 import hardware
-from network import SteerNet, VSNet
+from networks import SteerNet, VSNet
 
 model = SteerNet()
 device = torch.device("cpu")
