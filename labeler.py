@@ -189,12 +189,15 @@ pg.init()
 prev_img_num = -1
 
 # Labeling progress
-
+# big1 done
+# big3 69
+# big4 70
 start_img_num = 0
+
 img_num = 0
 
 # Load data
-vid_arr = np.loadtxt("rawvids/big2.csv", dtype="float16", delimiter=",", skiprows=start_img_num, max_rows=100)
+vid_arr = np.loadtxt("rawvids/big4.csv", dtype="float16", delimiter=",", skiprows=start_img_num, max_rows=100)
 vid_arr = vid_arr.astype("uint8")
 
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
