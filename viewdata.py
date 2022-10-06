@@ -34,7 +34,10 @@ cv2.resizeWindow("3", 352, 288)
 car = pg.Surface((35, 55))
 
 while True:
-    images = vid_arr[img_num]
+    try:
+        images = vid_arr[img_num]
+    except:
+        break
     img0 = images[:147456]
     img0 = img0.reshape(192, 256, 3)
     img1 = images[147456:223488]
@@ -80,7 +83,7 @@ while True:
         img_num += 1
 
 
-with open("vstrainingdata/vs_train_clean.csv", "a") as file:
-    vs_blur_arr = vs_blur_arr.reshape(-1, 12120)
-    full = np.concatenate((vid_arr, vs_blur_arr), axis=1)
-    np.savetxt(file, full, fmt="%.3f", delimiter=",")
+# with open("vstrainingdata/vs_train_clean.csv", "a") as file:
+#     vs_blur_arr = vs_blur_arr.reshape(-1, 12120)
+#     full = np.concatenate((vid_arr, vs_blur_arr), axis=1)
+#     np.savetxt(file, full, fmt="%.4f", delimiter=",")
