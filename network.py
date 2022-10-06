@@ -33,7 +33,7 @@ class VSNet(nn.Module):
         self.fc1 = nn.Linear(9472, 1000)
         self.fc2 = nn.Linear(1000, 12120)
 
-        # Backbone and FPNs
+        # ResNet and FPNs
         self.n1 = nn.ModuleDict(dict(
             conv1=nn.Conv2d(3, 16, kernel_size=(3, 5), stride=(3, 4), padding=1, bias=False),
             pool=nn.MaxPool2d(kernel_size=2, stride=2),
