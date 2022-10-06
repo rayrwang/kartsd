@@ -51,7 +51,7 @@ device = torch.device("cuda")
 model = VSNet().to(device)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-# scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, 0.9)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer)
 
 norm1 = torch.nn.BatchNorm2d(3)
 norm1 = norm1.to(device)
@@ -76,20 +76,25 @@ for epoch in range(1000):
         train_loss.backward()
         optimizer.step()
 
-        with torch.no_grad():
-            model.eval()
-            for x1, x2, x3, labels in test_dataloader:
-                x1 = x1.to(device)
-                x2 = x2.to(device)
-                x3 = x3.to(device)
-                labels = labels.to(device)
-                x1 = norm1(x1)
-                x2 = norm1(x2)
-                x3 = norm1(x3)
+        try:
+            print(f"Epoch {epoch + 1}, Step {step + 1}, "
+                  f"Train loss:{train_loss.item() : .4f}, Test loss:{test_loss.item() : .4f}")
+        except NameError:
+            print(f"Epoch {epoch + 1}, Step {step + 1}, "
+                  f"Train loss:{train_loss.item() : .4f}, Test loss: Not defined yet")
 
-                outputs = model(x1, x2, x3)
-                test_loss = criterion(outputs, labels)
+    with torch.no_grad():
+        model.eval()
+        for x1, x2, x3, labels in test_dataloader:
+            x1 = x1.to(device)
+            x2 = x2.to(device)
+            x3 = x3.to(device)
+            labels = labels.to(device)
+            x1 = norm1(x1)
+            x2 = norm1(x2)
+            x3 = norm1(x3)
 
-        print(f"Epoch {epoch+1}, Step {step+1}, "
-              f"Train loss:{train_loss.item() : .4f}, Test loss:{test_loss.item() : .4f}")
-    # scheduler.step()
+            outputs = model(x1, x2, x3)
+            test_loss = criterion(outputs, labels)
+
+    scheduler.step(test_loss)
