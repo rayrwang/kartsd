@@ -8,3 +8,4 @@ archive/
 rawvids/
 vstrainingdata/
 *.pth
+.vscode/
