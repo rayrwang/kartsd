@@ -30,19 +30,19 @@ class VSNet(nn.Module):
         super().__init__()
 
         self.dropout = nn.Dropout(p=0.5)
-        self.fc1 = nn.Linear(15488, 500)
+        self.fc1 = nn.Linear(8192, 500)
         self.fc2 = nn.Linear(500, 12120)
 
         # Networks
         self.n1 = nn.ModuleDict(dict(
-            conv1=nn.Conv2d(3, 16, kernel_size=7, stride=(2, 4)),
+            conv1=nn.Conv2d(3, 16, kernel_size=7, stride=(3, 4)),
             conv2=nn.Conv2d(16, 32, kernel_size=3, stride=2),
             conv3=nn.Conv2d(32, 64, kernel_size=3, stride=2),
             conv4=nn.Conv2d(64, 128, kernel_size=3, stride=2),
             act=nn.ReLU()
         ))
         self.n2 = nn.ModuleDict(dict(
-            conv1=nn.Conv2d(3, 32, kernel_size=7, stride=(2, 6)),
+            conv1=nn.Conv2d(3, 32, kernel_size=7, stride=(3, 6)),
             conv2=nn.Conv2d(32, 64, kernel_size=3, stride=2),
             conv3=nn.Conv2d(64, 128, kernel_size=3, stride=2),
             act=nn.ReLU()
@@ -59,19 +59,19 @@ class VSNet(nn.Module):
         x1 = n1.act(n1.conv3(x1))
         x1 = n1.act(n1.conv4(x1))
         # print(x1.shape)
-        x1 = x1.reshape(-1, 6272)
+        x1 = x1.reshape(-1, 3584)
 
         x2 = n2.act(n2.conv1(x2))
         x2 = n2.act(n2.conv2(x2))
         x2 = n2.act(n2.conv3(x2))
         # print(x2.shape)
-        x2 = x2.reshape(-1, 4608)
+        x2 = x2.reshape(-1, 2304)
 
         x3 = n3.act(n3.conv1(x3))
         x3 = n3.act(n3.conv2(x3))
         x3 = n3.act(n3.conv3(x3))
         # print(x3.shape)
-        x3 = x3.reshape(-1, 4608)
+        x3 = x3.reshape(-1, 2304)
 
         x = torch.cat((x1, x2, x3), dim=1)
 
