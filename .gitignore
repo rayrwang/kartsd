@@ -1,10 +1,9 @@
 .git/
 __pycache__/
-*.csv
 .idea/
 .vs/
 venv/
 archive/
-rawvids/
-vstrainingdata/
-*.pth
+
+*.csv
+*.npy
