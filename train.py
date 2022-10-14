@@ -55,7 +55,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
 norm1 = torch.nn.BatchNorm2d(3)
 norm1 = norm1.to(device)
-for epoch in range(1000):
+for epoch in range(500):
     model.train()
     for step, (x1, x2, x3, labels) in enumerate(train_dataloader):
         x1 = x1.to(device)
