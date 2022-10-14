@@ -47,7 +47,12 @@ class VSNet(nn.Module):
             conv3=nn.Conv2d(64, 128, kernel_size=3, stride=2),
             act=nn.ReLU()
         ))
-        self.n3 = self.n2
+        self.n3 = nn.ModuleDict(dict(
+            conv1=nn.Conv2d(3, 32, kernel_size=7, stride=(3, 6)),
+            conv2=nn.Conv2d(32, 64, kernel_size=3, stride=2),
+            conv3=nn.Conv2d(64, 128, kernel_size=3, stride=2),
+            act=nn.ReLU()
+        ))
 
     def forward(self, x1, x2, x3):
         n1 = self.n1
