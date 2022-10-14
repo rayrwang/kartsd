@@ -88,7 +88,33 @@ class VSNet(nn.Module):
             outconv4=nn.Conv2d(16, 8, kernel_size=3, stride=3, bias=False),
             act=nn.ReLU()
         ))
-        self.n3 = self.n2
+        self.n3 = nn.ModuleDict(dict(
+            conv1=nn.Conv2d(3, 16, kernel_size=(5, 6), stride=(1, 2), padding=(5, 11), bias=False),
+            pool1=nn.MaxPool2d(kernel_size=3, stride=2),
+            pool=nn.MaxPool2d(kernel_size=2, stride=2),
+            skip1=nn.Conv2d(16, 32, kernel_size=1, stride=1, bias=False),
+            conv2=nn.Conv2d(16, 32, kernel_size=3, stride=2, padding=1, bias=False),
+            conv3=nn.Conv2d(32, 32, kernel_size=3, stride=1, padding="same", bias=False),
+            skip2=nn.Conv2d(32, 64, kernel_size=1, stride=1, bias=False),
+            conv4=nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1, bias=False),
+            conv5=nn.Conv2d(64, 64, kernel_size=3, stride=1, padding="same", bias=False),
+            skip3=nn.Conv2d(64, 128, kernel_size=1, stride=1, bias=False),
+            conv6=nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1, bias=False),
+            conv7=nn.Conv2d(128, 128, kernel_size=3, stride=1, padding="same", bias=False),
+            lateral1=nn.Conv2d(16, 16, 1, bias=False),
+            lateral2=nn.Conv2d(32, 32, 1, bias=False),
+            lateral3=nn.Conv2d(64, 64, 1, bias=False),
+            lateral4=nn.Conv2d(128, 128, 1, bias=False),
+            down=nn.Upsample(scale_factor=2),
+            down1=nn.Conv2d(128, 64, 1, bias=False),
+            down2=nn.Conv2d(64, 32, 1, bias=False),
+            down3=nn.Conv2d(32, 16, 1, bias=False),
+            outconv1=nn.Conv2d(128, 64, kernel_size=3, stride=3, bias=False),
+            outconv2=nn.Conv2d(64, 32, kernel_size=3, stride=3, bias=False),
+            outconv3=nn.Conv2d(32, 16, kernel_size=3, stride=3, bias=False),
+            outconv4=nn.Conv2d(16, 8, kernel_size=3, stride=3, bias=False),
+            act=nn.ReLU()
+        ))
 
     def forward(self, x1, x2, x3):
         n1 = self.n1
