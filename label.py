@@ -80,7 +80,6 @@ def draw_img0(event, x, y, *args, **kwargs):
     elif event == cv2.EVENT_MOUSEMOVE:
         if l_down:
             edges_img0[y, x] = 255
-            edge_img_changed = True
 
 
 def draw_img1(event, x, y, *args, **kwargs):
@@ -98,7 +97,6 @@ def draw_img1(event, x, y, *args, **kwargs):
     elif event == cv2.EVENT_MOUSEMOVE:
         if l_down:
             edges_img1[y, x] = 255
-            edge_img_changed = True
 
 
 def draw_img2(event, x, y, *args, **kwargs):
@@ -116,7 +114,6 @@ def draw_img2(event, x, y, *args, **kwargs):
     elif event == cv2.EVENT_MOUSEMOVE:
         if l_down:
             edges_img2[y, x] = 255
-            edge_img_changed = True
 
 
 def draw_edge0(event, x, y, *args, **kwargs):
@@ -134,10 +131,8 @@ def draw_edge0(event, x, y, *args, **kwargs):
     elif event == cv2.EVENT_MOUSEMOVE:
         if r_down:
             edges_img0[:, :] = 0
-            edge_img_changed = True
         elif l_down:
             edges_img0[y - 5: y + 6, x - 5: x + 6] = 0
-            edge_img_changed = True
 
 
 def draw_edge1(event, x, y, *args, **kwargs):
@@ -155,10 +150,8 @@ def draw_edge1(event, x, y, *args, **kwargs):
     elif event == cv2.EVENT_MOUSEMOVE:
         if r_down:
             edges_img1[:, :] = 0
-            edge_img_changed = True
         elif l_down:
             edges_img1[y - 5: y + 6, x - 5: x + 6] = 0
-            edge_img_changed = True
 
 
 def draw_edge2(event, x, y, *args, **kwargs):
@@ -176,10 +169,8 @@ def draw_edge2(event, x, y, *args, **kwargs):
     elif event == cv2.EVENT_MOUSEMOVE:
         if r_down:
             edges_img2[:, :] = 0
-            edge_img_changed = True
         elif l_down:
             edges_img2[y - 5: y + 6, x - 5: x + 6] = 0
-            edge_img_changed = True
 
 
 window = pg.display.set_mode((505, 655))
@@ -192,12 +183,14 @@ prev_img_num = -1
 # big1 done
 # big3 69
 # big4 70
-start_img_num = 0
+# big5 84
+# big9 48
+start_img_num = 48
 
 img_num = 0
 
 # Load data
-vid_arr = np.loadtxt("rawvids/big4.csv", dtype="float16", delimiter=",", skiprows=start_img_num, max_rows=100)
+vid_arr = np.loadtxt("rawvids/big9.csv", dtype="float16", delimiter=",", skiprows=start_img_num, max_rows=100)
 vid_arr = vid_arr.astype("uint8")
 
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
@@ -242,6 +235,8 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
                     save = True
                 elif keys[pg.K_a]:
                     img_num -= 1
+                elif keys[pg.K_f]:
+                    edge_img_changed = True
 
         # Handle mouse click to flip pixels
         buttons = pg.mouse.get_pressed(num_buttons=3)
@@ -256,11 +251,6 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
             vs[119 - y - 3: 119 - y + 4, x - 3: x + 4] = 0
         elif buttons[2]:
             vs[119 - y, x] = 1
-
-        if edge_img_changed:
-            cv2.imshow("4", edges_img0)
-            cv2.imshow("5", edges_img1)
-            cv2.imshow("6", edges_img2)
 
         if img_num != prev_img_num:
             # Write previous completed image and vs to file
@@ -285,14 +275,17 @@ with open(r"vstrainingdata/vs_train_rough.csv", "a") as file:
             cv2.imshow("3", img2)
 
             # Compute edges
-            edges_img0 = cv2.Canny(img0, 15000, 25000, apertureSize=7, L2gradient=True)
+            edges_img0 = cv2.Canny(img0, 150000, 25000, apertureSize=7, L2gradient=True)
             cv2.imshow("4", edges_img0)
-            edges_img1 = cv2.Canny(img1, 15000, 25000, apertureSize=7, L2gradient=True)
+            edges_img1 = cv2.Canny(img1, 150000, 25000, apertureSize=7, L2gradient=True)
             cv2.imshow("5", edges_img1)
-            edges_img2 = cv2.Canny(img2, 15000, 25000, apertureSize=7, L2gradient=True)
+            edges_img2 = cv2.Canny(img2, 150000, 25000, apertureSize=7, L2gradient=True)
             cv2.imshow("6", edges_img2)
             print(start_img_num + img_num, start_img_num + vid_arr.shape[0])
 
+        cv2.imshow("4", edges_img0)
+        cv2.imshow("5", edges_img1)
+        cv2.imshow("6", edges_img2)
         if img_num != prev_img_num or edge_img_changed:
             edge_img_changed = False
             prev_img_num = img_num

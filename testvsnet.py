@@ -13,7 +13,7 @@ window = pg.display.set_mode((505, 655))
 pg.init()
 
 # Load data
-arr = np.loadtxt("rawvids/big2.csv", dtype="float16", delimiter=",", max_rows=None)
+arr = np.load("rawvids/big6.npy")
 vid_arr = arr[:, :299520]
 vid_arr = vid_arr.astype("uint8")
 
@@ -38,7 +38,7 @@ car = pg.Surface((35, 55))
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/vs100.pth", map_location=device))
+model.load_state_dict(torch.load("models/vs125.pth", map_location=device))
 
 model.eval()
 norm1 = torch.nn.BatchNorm2d(3)

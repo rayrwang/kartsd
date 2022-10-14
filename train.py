@@ -8,7 +8,8 @@ from networks import VSNet
 
 class TrainingData(Dataset):
     def __init__(self):
-        data = np.loadtxt("vstrainingdata/vs_train_clean.csv", dtype="float32", delimiter=",", max_rows=None)
+        data = np.load("vstrainingdata/vs_train_clean.npy")
+        data = data.astype("float32")
 
         self.x1 = torch.from_numpy(data[:, :147456])
         self.x1 = torch.reshape(self.x1, (-1, 192, 256, 3))
