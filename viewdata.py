@@ -15,6 +15,7 @@ vid_arr = arr[:, :299520]
 vid_arr = vid_arr.astype("uint8")
 vs_arr = arr[:, 299520:]
 
+# Widen edges in original data
 vs_blur_arr = np.zeros((1, 120, 101))
 ceil = np.vectorize(lambda x: 1 if x != 0 else 0)
 for vs in vs_arr:
@@ -23,6 +24,35 @@ for vs in vs_arr:
     vs_blur = vs.reshape((120, 101))
     vs_blur_arr = np.append(vs_blur_arr, [vs_blur], 0)
 vs_blur_arr = np.delete(vs_blur_arr, 0, 0)
+
+# Horizontal flip data augment
+for images, vs_blur in zip(vid_arr.copy(), vs_blur_arr.copy()):
+    img0 = images[:147456]
+    img0 = img0.reshape(192, 256, 3)
+    img1 = images[147456:223488]
+    img1 = img1.reshape(144, 176, 3)
+    img2 = images[223488:]
+    img2 = img2.reshape(144, 176, 3)
+
+    # Flip all 3 images, and swap left and right images
+    img0 = cv2.flip(img0, 1)
+    img1 = cv2.flip(img1, 1)
+    img2 = cv2.flip(img2, 1)
+    new_img1 = img2
+    new_img2 = img1
+    img1 = new_img1
+    img2 = new_img2
+
+    # Flip vs
+    vs_blur = cv2.flip(vs_blur, 1)
+
+    # Append new data
+    flat0 = img0.reshape(147456)
+    flat1 = img1.reshape(76032)
+    flat2 = img2.reshape(76032)
+    full = np.concatenate((flat0, flat1, flat2))
+    vid_arr = np.append(vid_arr, [full], 0)
+    vs_blur_arr = np.append(vs_blur_arr, [vs_blur], 0)
 
 # Init video and vs displays
 img_num = 0
@@ -39,7 +69,7 @@ car = pg.Surface((35, 55))
 while True:
     try:
         images = vid_arr[img_num]
-    except:
+    except:  # Reached end of array
         break
     img0 = images[:147456]
     img0 = img0.reshape(192, 256, 3)
@@ -51,7 +81,6 @@ while True:
     cv2.imshow("2", img1)
     cv2.imshow("3", img2)
 
-    # print(steer, img_num)
     print(img_num, arr.shape[0], vid_arr.shape[0], vs_blur_arr.shape[0])
 
     # Display vs
