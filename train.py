@@ -61,7 +61,6 @@ for epoch in range(500):
         x1 = x1.to(device)
         x2 = x2.to(device)
         x3 = x3.to(device)
-        # labels = torch.zeros(labels.shape)
         labels = labels.to(device)
         x1 = norm1(x1)
         x2 = norm1(x2)
