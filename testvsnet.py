@@ -18,7 +18,7 @@ vid_arr = arr[:, :299520]
 vid_arr = vid_arr.astype("uint8")
 
 # Init video and vs displays
-img_num = 0
+img_num = 200
 prev_img_num = -1
 
 cv2.namedWindow("1", cv2.WINDOW_NORMAL)
