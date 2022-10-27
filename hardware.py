@@ -21,7 +21,9 @@ class VidCap:
 
     def read(self):
         for cam in range(self.n_cams):
-            _, img = getattr(self, f"cap{cam}").read()
+            getattr(self, f"cap{cam}").grab()
+        for cam in range(self.n_cams):
+            _, img = getattr(self, f"cap{cam}").retrieve()
             setattr(self, f"img{cam}", img)
 
     def write(self):
