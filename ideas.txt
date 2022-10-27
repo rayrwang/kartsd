@@ -1,1 +1,0 @@
-try function on vs network output (e.g. square)
