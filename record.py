@@ -1,3 +1,7 @@
+"""
+Record videos
+"""
+
 import time
 
 import cv2
@@ -6,7 +10,6 @@ from hardware import VidCap
 
 cap = VidCap(1, 640, 480, 10)
 
-time.sleep(5)
 while True:
     cap.read()
     cap.write()
