@@ -1,9 +1,36 @@
 import math
-import time
 
 import pyfirmata as pf
 import pygame as pg
 import cv2
+
+
+class VidCap:
+    def __init__(self, n_cams, fw, fh, fps):
+        self.n_cams = n_cams
+
+        for cam in range(n_cams):
+            new_cap = cv2.VideoCapture(cam+1, cv2.CAP_DSHOW)
+            new_cap.set(cv2.CAP_PROP_FRAME_WIDTH, fw)
+            new_cap.set(cv2.CAP_PROP_FRAME_HEIGHT, fh)
+            new_cap.set(cv2.CAP_PROP_FPS, fps)
+            setattr(self, f"cap{cam}", new_cap)
+
+            setattr(self, f"wr{cam}",
+                    cv2.VideoWriter(f'v{cam}.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (fw, fh)))
+
+    def read(self):
+        for cam in range(self.n_cams):
+            _, img = getattr(self, f"cap{cam}").read()
+            setattr(self, f"img{cam}", img)
+
+    def write(self):
+        for cam in range(self.n_cams):
+            getattr(self, f"wr{cam}").write(getattr(self, f"img{cam}"))
+
+    def imshow(self):
+        for cam in range(self.n_cams):
+            cv2.imshow(f"{cam}", getattr(self, f"img{0}"))
 
 
 def init_hardware(update_msec):
