@@ -2,8 +2,6 @@
 Record videos
 """
 
-import time
-
 import cv2
 
 from hardware import VidCap
