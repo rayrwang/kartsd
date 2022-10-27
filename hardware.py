@@ -1,3 +1,7 @@
+"""
+For interacting with hardware (cameras, Arduino ports, display)
+"""
+
 import math
 
 import pyfirmata as pf
@@ -6,7 +10,11 @@ import cv2
 
 
 class VidCap:
-    def __init__(self, n_cams, fw, fh, fps):
+    """
+    Class to hold necessary objects and functionality for cameras
+    """
+    def __init__(self, session_n, n_cams, fw, fh, fps):
+        self.session_n = session_n
         self.n_cams = n_cams
 
         for cam in range(n_cams):
@@ -17,7 +25,7 @@ class VidCap:
             setattr(self, f"cap{cam}", new_cap)
 
             setattr(self, f"wr{cam}",
-                    cv2.VideoWriter(f'v{cam}.avi', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (fw, fh)))
+                    cv2.VideoWriter(f"{session_n}_{cam}.avi", cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (fw, fh)))
 
     def read(self):
         for cam in range(self.n_cams):

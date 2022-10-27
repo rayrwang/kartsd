@@ -6,7 +6,16 @@ import cv2
 
 from hardware import VidCap
 
-cap = VidCap(1, 640, 480, 10)
+try:
+    with open("record_session_n.txt", 'r') as f:
+        session_n = int(f.read())
+except FileNotFoundError:
+    session_n = 0
+
+with open("record_session_n.txt", "w") as f:
+    f.write(f"{session_n+1}")
+
+cap = VidCap(session_n, 1, 640, 480, 10)
 
 while True:
     cap.read()
