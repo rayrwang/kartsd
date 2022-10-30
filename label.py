@@ -1,4 +1,7 @@
-import time
+"""
+Construct vs labels from images
+"""
+
 import math
 
 import numpy as np
