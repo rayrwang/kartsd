@@ -8,3 +8,5 @@ venv/
 *.avi
 *.csv
 *.npy
+
+archive/
