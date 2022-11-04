@@ -18,7 +18,7 @@ class VidCap:
         self.n_cams = n_cams
 
         for cam in range(n_cams):
-            new_cap = cv2.VideoCapture(cam+1, cv2.CAP_DSHOW)
+            new_cap = cv2.VideoCapture(cam, cv2.CAP_DSHOW)
             new_cap.set(cv2.CAP_PROP_FRAME_WIDTH, fw)
             new_cap.set(cv2.CAP_PROP_FRAME_HEIGHT, fh)
             new_cap.set(cv2.CAP_PROP_FPS, fps)
@@ -40,7 +40,7 @@ class VidCap:
 
     def imshow(self):
         for cam in range(self.n_cams):
-            cv2.imshow(f"{cam}", getattr(self, f"img{0}"))
+            cv2.imshow(f"{cam}", getattr(self, f"img{cam}"))
 
 
 def init_hardware(update_msec):
