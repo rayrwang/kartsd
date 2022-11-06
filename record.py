@@ -15,7 +15,7 @@ except FileNotFoundError:
 with open("record_session_n.txt", "w") as f:
     f.write(f"{session_n+1}")
 
-cap = VidCap(session_n, 1, 640, 480, 10)
+cap = VidCap(session_n, 5, 640, 480, 5)
 
 while True:
     cap.read()

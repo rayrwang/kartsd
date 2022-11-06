@@ -27,6 +27,9 @@ class VidCap:
             setattr(self, f"wr{cam}",
                     cv2.VideoWriter(f"{session_n}_{cam}.avi", cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (fw, fh)))
 
+            cv2.namedWindow(f"{cam}", cv2.WINDOW_NORMAL)
+            cv2.resizeWindow(f"{cam}", 240, 180)
+
     def read(self):
         for cam in range(self.n_cams):
             getattr(self, f"cap{cam}").grab()
