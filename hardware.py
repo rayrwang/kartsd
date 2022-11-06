@@ -46,119 +46,93 @@ class VidCap:
             cv2.imshow(f"{cam}", getattr(self, f"img{cam}"))
 
 
-def init_hardware(update_msec):
-    # Init camera
-    cap0 = cv2.VideoCapture(0)
-    cap0.set(cv2.CAP_PROP_FRAME_WIDTH, 256)
-    cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 192)
-    cap0.set(cv2.CAP_PROP_FPS, 30)
+class Board:
+    """Arduino control"""
+    def __init__(self, port):
+        # Init Arduino
+        self.board = pf.Arduino(port)
+        self.it = pf.util.Iterator(self.board)
+        self.it.start()
+        self.board.analog[0].enable_reporting()
 
-    cap1 = cv2.VideoCapture(42)
-    cap1.set(cv2.CAP_PROP_FRAME_WIDTH, 176)
-    cap1.set(cv2.CAP_PROP_FRAME_HEIGHT, 144)
-    cap1.set(cv2.CAP_PROP_FPS, 30)
+        # Angle input data 0.04 to 0.96, 0.5=center
+        # Angle region handles data crossing boundary (e.g. 0.96 to 0.04)
+        self.angle_region = 1
+        self.angle_read = 0.5
+        self.last = 0.5
+        self.degree = 0
 
-    cap2 = cv2.VideoCapture(43)
-    cap2.set(cv2.CAP_PROP_FRAME_WIDTH, 176)
-    cap2.set(cv2.CAP_PROP_FRAME_HEIGHT, 144)
-    cap2.set(cv2.CAP_PROP_FPS, 30)
+    def update_angle(self):
+        self.last = self.angle_read
+        self.angle_read = self.board.analog[0].read()
 
-    # Init arduino
-    try:
-        board = pf.Arduino('/dev/ttyACM0')
-    except:
-        try:
-            board = pf.Arduino('/dev/ttyACM1')
-        except:
-            pass
+        # Handle crossing angle region boundary
+        if self.angle_read > 0.80 and self.last < 0.20:
+            self.angle_region -= 1
+        if self.angle_read < 0.20 and self.last > 0.80:
+            self.angle_region += 1
 
-    it = pf.util.Iterator(board)
-    it.start()
-    board.analog[0].enable_reporting()
+        if self.angle_region == 0:
+            self.degree = -1 / 7 * (0.04 - (0.96 - self.angle_read) - 0.5) * 360 / 0.92
+        elif self.angle_region == 1:
+            self.degree = -1 / 7 * (self.angle_read - 0.5) * 360 / 0.92
+        elif self.angle_region == 2:
+            self.degree = -1 / 7 * (0.96 + (self.angle_read - 0.04) - 0.5) * 360 / 0.92
 
-    # Angle input data 0.04 to 0.96, 0.5=center
-    # Angle region handles data crossing boundary (e.g. 0.96 to 0.04)
-    angle_region = 1
-    angle_read = 0.5
-    last = 0.5
+    def turn(self, deg):
+        """turn steering ccw (dir=True), cw"""
+        if deg > 0:
+            self.board.digital[4].write(1)
+        else:
+            self.board.digital[4].write(0)
 
-    # Init pygame display
-    window = pg.display.set_mode((0, 0))
-    pg.init()
-
-    clock = pg.time.Clock()
-
-    update = pg.USEREVENT + 1
-    pg.time.set_timer(update, update_msec)
-
-    # Init fonts
-    font0 = pg.font.Font("Helvetica.ttf", 100)
-    font1 = pg.font.Font("Helvetica.ttf", 75)
-    font2 = pg.font.Font("Helvetica.ttf", 25)
-
-    return cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update
+        for i in range(min(1, round(math.fabs(deg * 4)))):
+            self.board.digital[2].write(0)
+            self.board.digital[2].write(1)
 
 
-def update_angle(board, angle_region, angle_read, last):
-    last = angle_read
-    angle_read = board.analog[0].read()
+class Display:
+    def __init__(self, update_msec):
+        # Init pygame display
+        self.window = pg.display.set_mode((0, 0))
+        pg.init()
+        self.clock = pg.time.Clock()
 
-    # Handle crossing angle region boundary
-    if angle_read > 0.80 and last < 0.20:
-        angle_region -= 1
-    if angle_read < 0.20 and last > 0.80:
-        angle_region += 1
+        self.update_event = pg.USEREVENT + 1
+        pg.time.set_timer(self.update_event, update_msec)
 
-    if angle_region == 0:
-        degree = -1 / 7 * (0.04 - (0.96 - angle_read) - 0.5) * 360 / 0.92
-    elif angle_region == 1:
-        degree = -1 / 7 * (angle_read - 0.5) * 360 / 0.92
-    elif angle_region == 2:
-        degree = -1 / 7 * (0.96 + (angle_read - 0.04) - 0.5) * 360 / 0.92
+        # Init fonts
+        self.font0 = pg.font.Font("Helvetica.ttf", 100)
+        self.font1 = pg.font.Font("Helvetica.ttf", 75)
+        self.font2 = pg.font.Font("Helvetica.ttf", 25)
 
-    return angle_region, angle_read, last, degree
+    def update(self, board, pred):
+        # Display update
+        self.window.fill((255, 255, 255))
 
+        region_txt = self.font2.render(f"{board.angle_region}", False, (0, 0, 0))
+        self.window.blit(region_txt, (0, 0))
 
-def update_display(window, font0, font1, font2, angle_region, angle_read, degree, pred):
-    # Display update
-    window.fill((255, 255, 255))
+        angle_read_txt = self.font2.render(f"{board.angle_read}", False, (0, 0, 0))
+        self.window.blit(angle_read_txt, (0, 50))
 
-    region_txt = font2.render(f"{angle_region}", False, (0, 0, 0))
-    window.blit(region_txt, (0, 0))
+        pred_txt = self.font2.render(f"{pred : .4f}", False, (0, 0, 0))
+        self.window.blit(pred_txt, (0, 100))
 
-    angle_read_txt = font2.render(f"{angle_read}", False, (0, 0, 0))
-    window.blit(angle_read_txt, (0, 50))
+        degree_txt = self.font0.render(f"{math.fabs(board.degree) : .2f}", False, (0, 0, 0))
 
-    pred_txt = font2.render(f"{pred : .4f}", False, (0, 0, 0))
-    window.blit(pred_txt, (0, 100))
+        if board.degree > 0:
+            dir_txt = self.font1.render("Left", False, (0, 0, 0))
+        elif board.degree <= 0:
+            dir_txt = self.font1.render("Right", False, (0, 0, 0))
 
-    degree_txt = font0.render(f"{math.fabs(degree) : .2f}", False, (0, 0, 0))
+        # Display text
+        degree_rect = degree_txt.get_rect()
+        degree_rect.center = (300, 512)
+        self.window.blit(degree_txt, degree_rect)
 
-    if degree > 0:
-        dir_txt = font1.render("Left", False, (0, 0, 0))
-    elif degree <= 0:
-        dir_txt = font1.render("Right", False, (0, 0, 0))
+        dir_rect = dir_txt.get_rect()
+        dir_rect.center = (300, 400)
+        self.window.blit(dir_txt, dir_rect)
 
-    # Display text
-    degree_rect = degree_txt.get_rect()
-    degree_rect.center = (300, 512)
-    window.blit(degree_txt, degree_rect)
-
-    dir_rect = dir_txt.get_rect()
-    dir_rect.center = (300, 400)
-    window.blit(dir_txt, dir_rect)
-
-    pg.display.update()
-
-
-def turn(board, deg):
-    """turn steering ccw (dir=True), cw"""
-    if deg > 0:
-        board.digital[4].write(1)
-    else:
-        board.digital[4].write(0)
-
-    kp = 4
-    for i in range(min(40, round(math.fabs(deg*kp)))):
-        board.digital[2].write(0)
-        board.digital[2].write(1)
+        pg.display.update()
