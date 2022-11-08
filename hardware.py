@@ -21,7 +21,6 @@ class VidCap:
             new_cap = cv2.VideoCapture(cam, cv2.CAP_DSHOW)
             new_cap.set(cv2.CAP_PROP_FRAME_WIDTH, fw)
             new_cap.set(cv2.CAP_PROP_FRAME_HEIGHT, fh)
-            new_cap.set(cv2.CAP_PROP_FPS, fps)
             setattr(self, f"cap{cam}", new_cap)
 
             setattr(self, f"wr{cam}",
@@ -97,7 +96,6 @@ class Display:
         self.window = pg.display.set_mode((0, 0))
         pg.init()
         self.clock = pg.time.Clock()
-
         self.update_event = pg.USEREVENT + 1
         pg.time.set_timer(self.update_event, update_msec)
 
