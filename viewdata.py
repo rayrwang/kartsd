@@ -1,120 +1,75 @@
-import time
-import math
-
 import numpy as np
 import cv2
 import pygame as pg
 
-window = pg.display.set_mode((505, 655))
+window = pg.display.set_mode((505, 600))
 pg.init()
+car = pg.Surface((0.9/0.25*5, 1.5/0.25*5))
+car.fill((0, 0, 0))
 
-# Load data
-# arr = np.loadtxt("vstrainingdata/vs_train_rough.csv", delimiter=",", dtype="float32", skiprows=0, max_rows=None)
-arr = np.load("vstrainingdata/vs_train_clean.npy")
-vid_arr = arr[:, :299520]
-vid_arr = vid_arr.astype("uint8")
-vs_arr = arr[:, 299520:]
-
-# Widen edges in original data
-vs_blur_arr = np.zeros((1, 120, 101))
-ceil = np.vectorize(lambda x: 1 if x != 0 else 0)
-for vs in vs_arr:
-    # vs_blur = cv2.GaussianBlur(vs.reshape((120, 101)), (3, 3), 10)
-    # vs_blur = ceil(vs_blur)
-    vs_blur = vs.reshape((120, 101))
-    vs_blur_arr = np.append(vs_blur_arr, [vs_blur], 0)
-vs_blur_arr = np.delete(vs_blur_arr, 0, 0)
-
-# Horizontal flip data augment
-for images, vs_blur in zip(vid_arr.copy(), vs_blur_arr.copy()):
-    img0 = images[:147456]
-    img0 = img0.reshape(192, 256, 3)
-    img1 = images[147456:223488]
-    img1 = img1.reshape(144, 176, 3)
-    img2 = images[223488:]
-    img2 = img2.reshape(144, 176, 3)
-
-    # Flip all 3 images, and swap left and right images
-    img0 = cv2.flip(img0, 1)
-    img1 = cv2.flip(img1, 1)
-    img2 = cv2.flip(img2, 1)
-    new_img1 = img2
-    new_img2 = img1
-    img1 = new_img1
-    img2 = new_img2
-
-    # Flip vs
-    vs_blur = cv2.flip(vs_blur, 1)
-
-    # Append new data
-    flat0 = img0.reshape(147456)
-    flat1 = img1.reshape(76032)
-    flat2 = img2.reshape(76032)
-    full = np.concatenate((flat0, flat1, flat2))
-    vid_arr = np.append(vid_arr, [full], 0)
-    vs_blur_arr = np.append(vs_blur_arr, [vs_blur], 0)
-
-# Init video and vs displays
 img_num = 0
 
-cv2.namedWindow("1", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("1", 512, 384)
-cv2.namedWindow("2", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("2", 352, 288)
-cv2.namedWindow("3", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("3", 352, 288)
-
-car = pg.Surface((35, 55))
+# Read from videos
+data = np.load("vstrainingdata/vs_train_rough.npy")
+data = data.astype("uint8")
+for i in range(5):
+    globals()[f"img_arr{i}"] = data[:, i*640*480*3:(i+1)*640*480*3]
+    cv2.namedWindow(f"{i}", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(f"{i}", 512, 384)
+drivable_arr = data[:, 5*640*480*3:5*640*480*3 + 120*101]
+edge_arr = data[:, 5*640*480*3 + 120*101:]
 
 while True:
-    try:
-        images = vid_arr[img_num]
-    except:  # Reached end of array
-        break
-    img0 = images[:147456]
-    img0 = img0.reshape(192, 256, 3)
-    img1 = images[147456:223488]
-    img1 = img1.reshape(144, 176, 3)
-    img2 = images[223488:]
-    img2 = img2.reshape(144, 176, 3)
-    cv2.imshow("1", img0)
-    cv2.imshow("2", img1)
-    cv2.imshow("3", img2)
+    # Handle key pressed
+    for event in pg.event.get():
+        if event.type == pg.KEYDOWN:
+            keys = pg.key.get_pressed()
+            if keys[pg.K_d]:
+                img_num += 1
+            elif keys[pg.K_s]:
+                img_num += 1
+            elif keys[pg.K_a]:
+                img_num -= 1
+            elif keys[pg.K_f]:
+                edge_img_changed = True
 
-    print(img_num, arr.shape[0], vid_arr.shape[0], vs_blur_arr.shape[0])
+    for i in range(5):
+        globals()[f"img{i}"] = globals()[f"img_arr{i}"][img_num]
+    drivable = drivable_arr[img_num]
+    edge = edge_arr[img_num]
 
-    # Display vs
+    img0 = img0.reshape(480, 640, 3)
+    img1 = img1.reshape(480, 640, 3)
+    img2 = img2.reshape(480, 640, 3)
+    img3 = img3.reshape(480, 640, 3)
+    img4 = img4.reshape(480, 640, 3)
+    drivable = drivable.reshape(120, 101)
+    edge = edge.reshape(120, 101)
+
+    # Show images
+    for i in range(5):
+        cv2.imshow(f"{i}", globals()[f"img{i}"])
+
+    # Display
+    # vs_blur = cv2.GaussianBlur(vs, (9, 9), 0)
     window.fill((255, 255, 255))
-    window.blit(car, (235, 600))
-    for n_y, y_row in enumerate(vs_blur_arr[img_num]):
-        for n_x, x in enumerate(y_row):
-            x = 255 - x * 255
-            x = max(0, x)
-            x = min(255, x)
-
+    for n_y, (edge_row, drivable_row) in enumerate(zip(edge, drivable)):
+        for n_x, (v, d) in enumerate(zip(edge_row, drivable_row)):
             rect = pg.Surface((5, 5))
-            pg.draw.rect(rect, (255, x, x), (0, 0, 5, 5))
+            if d != 0:
+                pg.draw.rect(rect, (210 + 45*d, 210 + 45*d, 210 + 45*d), (0, 0, 5, 5))
+            elif v != 0:
+                v = 255 - v * 255
+                v = max(0, v)
+                v = min(255, v)
+                pg.draw.rect(rect, (255, v, v), (0, 0, 5, 5))
+            else:
+                pg.draw.rect(rect, (210, 210, 210), (0, 0, 5, 5))
             window.blit(rect, (5 * n_x, 595 - (5 * n_y)))
+    window.blit(car, car.get_rect(center=(252.5, 400 + (1.5/2 - 0.2)/0.25*5)))
     pg.display.update()
-
-    prev_img_num = img_num
 
     if cv2.waitKey(1) == ord("f"):
         cv2.destroyAllWindows()
         cv2.VideoCapture(0).release()
         break
-
-    time.sleep(0.05)
-    keys = pg.key.get_pressed()
-    if keys[pg.K_w]:
-        vid_arr = np.delete(vid_arr, img_num, 0)
-        vs_blur_arr = np.delete(vs_blur_arr, img_num, 0)
-    if keys[pg.K_a]:
-        img_num -= 1
-    if keys[pg.K_d]:
-        img_num += 1
-
-
-vs_blur_arr = vs_blur_arr.reshape(-1, 12120)
-full = np.concatenate((vid_arr, vs_blur_arr), axis=1)
-np.save("vstrainingdata/vs_train_clean.npy", full)
