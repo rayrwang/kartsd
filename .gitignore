@@ -6,7 +6,6 @@ venv/
 .vscode/
 
 *.avi
-*.csv
 *.npy
 *.txt
 
