@@ -13,7 +13,8 @@ class VidCap:
     """
     Class to hold necessary objects and functionality for cameras
     """
-    def __init__(self, session_n, n_cams, fw, fh, fps):
+
+    def __init__(self, n_cams, fw, fh, session_n=None, fps=None):
         self.session_n = session_n
         self.n_cams = n_cams
 
@@ -23,8 +24,9 @@ class VidCap:
             new_cap.set(cv2.CAP_PROP_FRAME_HEIGHT, fh)
             setattr(self, f"cap{cam}", new_cap)
 
-            setattr(self, f"wr{cam}",
-                    cv2.VideoWriter(f"{session_n}_{cam}.avi", cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (fw, fh)))
+            if (session_n, fps) is not (None, None):
+                setattr(self, f"wr{cam}",
+                        cv2.VideoWriter(f"{session_n}_{cam}.avi", cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (fw, fh)))
 
             cv2.namedWindow(f"{cam}", cv2.WINDOW_NORMAL)
             cv2.resizeWindow(f"{cam}", 240, 180)
