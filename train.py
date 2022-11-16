@@ -11,30 +11,19 @@ class TrainingData(Dataset):
         data = np.load("vstrainingdata/vs_train_clean.npy")
         data = data.astype("float32")
 
-        self.x1 = torch.from_numpy(data[:, :147456])
-        self.x1 = torch.reshape(self.x1, (-1, 192, 256, 3))
-        self.x1 = self.x1[:, 50:, :, :]
-        self.x1 = torch.swapaxes(self.x1, 1, 3)
-        self.x1 = torch.swapaxes(self.x1, 2, 3)
+        for i in range(5):
+            xn = torch.from_numpy(data[:, i*640*480*3:(i+1)*640*480*3])
+            xn = torch.reshape(xn, (-1, 480, 640, 3))
+            xn = torch.swapaxes(xn, 1, 3)
+            xn = torch.swapaxes(xn, 2, 3)
+            setattr(self, f"x{i}", xn)
 
-        self.x2 = torch.from_numpy(data[:, 147456:223488])
-        self.x2 = torch.reshape(self.x2, (-1, 144, 176, 3))
-        self.x2 = self.x2[:, 85:, :, :]
-        self.x2 = torch.swapaxes(self.x2, 1, 3)
-        self.x2 = torch.swapaxes(self.x2, 2, 3)
-
-        self.x3 = torch.from_numpy(data[:, 223488:299520])
-        self.x3 = torch.reshape(self.x3, (-1, 144, 176, 3))
-        self.x3 = self.x3[:, 85:, :, :]
-        self.x3 = torch.swapaxes(self.x3, 1, 3)
-        self.x3 = torch.swapaxes(self.x3, 2, 3)
-
-        self.y = torch.from_numpy(data[:, 299520:])
+        self.y = torch.from_numpy(data[:, 5*640*480*3:])
 
         self.n_samples = data.shape[0]
 
     def __getitem__(self, index):
-        return self.x1[index], self.x2[index], self.x3[index], self.y[index]
+        return self.x0[index], self.x1[index], self.x2[index], self.x3[index], self.x4[index], self.y[index]
 
     def __len__(self):
         return self.n_samples
@@ -55,19 +44,23 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
 
 norm1 = torch.nn.BatchNorm2d(3)
 norm1 = norm1.to(device)
-for epoch in range(500):
+for epoch in range(10000):
     model.train()
-    for step, (x1, x2, x3, labels) in enumerate(train_dataloader):
+    for step, (x0, x1, x2, x3, x4, y) in enumerate(train_dataloader):
+        x0 = x0.to(device)
         x1 = x1.to(device)
         x2 = x2.to(device)
         x3 = x3.to(device)
-        labels = labels.to(device)
+        x4 = x4.to(device)
+        y = y.to(device)
+        x0 = norm1(x0)
         x1 = norm1(x1)
         x2 = norm1(x2)
         x3 = norm1(x3)
+        x4 = norm1(x4)
 
-        outputs = model(x1, x2, x3)
-        train_loss = criterion(outputs, labels)
+        yh = model(x0, x1, x2, x3, x4)
+        train_loss = criterion(yh, y)
 
         optimizer.zero_grad()
         train_loss.backward()
@@ -82,17 +75,21 @@ for epoch in range(500):
 
     with torch.no_grad():
         model.eval()
-        for x1, x2, x3, labels in test_dataloader:
+        for step, (x0, x1, x2, x3, x4, y) in enumerate(test_dataloader):
+            x0 = x0.to(device)
             x1 = x1.to(device)
             x2 = x2.to(device)
             x3 = x3.to(device)
-            labels = labels.to(device)
+            x4 = x4.to(device)
+            y = y.to(device)
+            x0 = norm1(x0)
             x1 = norm1(x1)
             x2 = norm1(x2)
             x3 = norm1(x3)
+            x4 = norm1(x4)
 
-            outputs = model(x1, x2, x3)
-            test_loss = criterion(outputs, labels)
+            yh = model(x0, x1, x2, x3, x4)
+            test_loss = criterion(yh, y)
 
     if (epoch + 1) % 25 == 0:
-        torch.save(model.state_dict(), f"models/vs{epoch + 1}.pth")
+        torch.save(model.state_dict(), f"models/test/vs{epoch + 1}.pth")
