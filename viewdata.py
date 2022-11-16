@@ -25,13 +25,14 @@ edge_arr = data[:, 5*640*480*3 + 120*101:]
 blur_arr = np.empty(edge_arr.reshape(-1, 120, 101).shape)
 blur_arr = cv2.GaussianBlur(edge_arr.reshape(-1, 120, 101).swapaxes(0, 2), (3, 3), 1).swapaxes(0, 2).reshape(-1, 12120)
 blur_arr = np.minimum(3*blur_arr, 1)
-# blur_arr = np.ceil(blur_arr)
-# blur_arr = cv2.GaussianBlur(blur_arr.reshape(-1, 120, 101).swapaxes(0, 2), (3, 3), 0).swapaxes(0, 2).reshape(-1, 12120)
+
+drivable_arr = cv2.GaussianBlur(drivable_arr.reshape(-1, 120, 101).swapaxes(0, 2), (5, 5), 1).swapaxes(0, 2).reshape(-1, 12120)
+
 
 while True:
     print(img_num, data.shape[0])
     # Handle key pressed
-    time.sleep(0.1)
+    time.sleep(0.05)
     keys = pg.key.get_pressed()
     if keys[pg.K_d]:
         img_num += 1
