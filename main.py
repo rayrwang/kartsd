@@ -23,7 +23,7 @@ cap = VidCap(5, 640, 480)
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/test/vs25.pth", map_location=device))
+model.load_state_dict(torch.load("models/vs.pth", map_location=device))
 model.eval()
 while True:
     # Get new image
