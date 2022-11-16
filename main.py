@@ -29,7 +29,7 @@ while True:
     # Get new image
     cap.read()
     for i in range(5):
-        _, globals()[f"img{i}"] = getattr(cap, f"img{i}")
+        globals()[f"img{i}"] = getattr(cap, f"img{i}")
     cap.imshow()
 
     # Inference
