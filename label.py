@@ -65,7 +65,10 @@ car.fill((0, 0, 0))
 prev_img_num = -1
 
 # Labeling progress
-img_num = 3690
+# 0: 10 +20 2610
+# 2: 10 +20 930 2370
+session_n = 0
+img_num = 2610
 
 # Camera calibrations
 cal = {
@@ -87,7 +90,6 @@ cal = {
 }
 
 # Read from videos
-session_n = 0
 for i in range(10):
     globals()[f"cap{i}"] = cv2.VideoCapture(f"rawvids/{session_n}_{i}.avi")
     cv2.namedWindow(f"{i}", cv2.WINDOW_NORMAL)
@@ -110,21 +112,22 @@ except FileNotFoundError:
     data = np.zeros((1, 5*640*480*3 + 2*120*101), dtype="uint8")
     open("vstrainingdata/vs_train_rough.npy", "x")
 while True:
+    print(img_num)
     save = False
 
     # Handle key pressed
     for event in pg.event.get():
-        # if event.type == pg.KEYDOWN:
-        keys = pg.key.get_pressed()
-        if keys[pg.K_d]:
-            img_num += 2
-        elif keys[pg.K_s]:
-            img_num += 2
-            save = True
-        elif keys[pg.K_a]:
-            img_num -= 2
-        elif keys[pg.K_f]:
-            edge_img_changed = True
+        if event.type == pg.KEYDOWN:
+            keys = pg.key.get_pressed()
+            if keys[pg.K_d]:
+                img_num += 20
+            elif keys[pg.K_s]:
+                img_num += 20
+                save = True
+            elif keys[pg.K_a]:
+                img_num -= 20
+            elif keys[pg.K_f]:
+                edge_img_changed = True
 
     # Handle mouse click to flip pixels
     buttons = pg.mouse.get_pressed(num_buttons=3)
@@ -133,13 +136,16 @@ while True:
     x = round((x_coord - 2.5) / 5)
     y = round((y_coord - 2.5) / 5)
 
-    if buttons[0]:
-        edge[119 - y - 2: 119 - y + 3, x - 2: x + 3] = 0
-        drivable[119 - y - 2: 119 - y + 3, x - 2: x + 3] = 1
-    elif buttons[1]:
+    if buttons[0]:  # Draw drivable area
+        for i in range(119 - y - 2, 119 - y + 3):
+            for j in range(x - 2, x + 3):
+                if 0 <= i < 120 and 0 <= j < 101:
+                    if edge[i, j] == 0:
+                        drivable[i, j] = 1
+    elif buttons[1]:  # Erase
         edge[119 - y - 1: 119 - y + 2, x - 1: x + 2] = 0
         drivable[119 - y - 1: 119 - y + 2, x - 1: x + 2] = 0
-    elif buttons[2]:
+    elif buttons[2]:  # Draw road edges
         if drivable[119 - y, x] != 1:
             edge[119 - y, x] = 1
 
