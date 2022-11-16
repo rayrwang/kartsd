@@ -43,6 +43,8 @@ class VSNet(nn.Module):
 
         x = F.relu(self.fc1(x))
         x = self.dropout(x)
-        x = F.relu(self.fc2(x))
+        x = self.fc2(x)
+
+        # todo normalize outputs
 
         return x
