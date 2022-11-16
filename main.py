@@ -84,47 +84,48 @@ while True:
         cv2.VideoCapture(0).release()
         break
 
+
 # import threading
 #
 # import pygame as pg
 # import cv2
 # import torch
 #
-# import hardware
+# from hardware import VidCap, Board, Display
 # from networks import SteerNet, VSNet
 #
-# model = SteerNet()
-# device = torch.device("cpu")
-# model.load_state_dict(torch.load("models/light_sides.pth", map_location=device))
-# model.eval()
+# # model = SteerNet()
+# # device = torch.device("cpu")
+# # model.load_state_dict(torch.load("models/light_sides.pth", map_location=device))
+# # model.eval()
 #
-# cap0, cap1, cap2, board, angle_region, angle_read, last, window, font0, font1, font2, update = hardware.init_hardware(update_msec=500)
-# cap0.set(cv2.CAP_PROP_FRAME_WIDTH, 128)
-# cap0.set(cv2.CAP_PROP_FRAME_HEIGHT, 96)
 # center = -1.5
 # gain = 1
+#
+# board = Board("COM3")
+# display = Display(500)
 # while True:
-#     _, img0 = cap0.read(0)
-#     cv2.imshow("", img0)
 #
-#     if cv2.waitKey(1) == ord("f"):
-#         cv2.destroyAllWindows()
-#         cv2.VideoCapture(0).release()
-#         break
 #
-#     img0 = img0.astype("float32")
-#     x = torch.from_numpy(img0[None, :])
-#     x = torch.swapaxes(x, 1, 3)
-#     x = torch.swapaxes(x, 2, 3)
-#     x = x.to(device)
-#     yhat = gain*(model(x).item() - center) + center
-#     angle_region, angle_read, last, degree = hardware.update_angle(board, angle_region, angle_read, last)
+#     # if cv2.waitKey(1) == ord("f"):
+#     #     cv2.destroyAllWindows()
+#     #     cv2.VideoCapture(0).release()
+#     #     break
 #
-#     turn_thread = threading.Thread(target=hardware.turn, args=(board, yhat-degree))
+#     # img0 = img0.astype("float32")
+#     # x = torch.from_numpy(img0[None, :])
+#     # x = torch.swapaxes(x, 1, 3)
+#     # x = torch.swapaxes(x, 2, 3)
+#     # x = x.to(device)
+#     # yhat = gain*(model(x).item() - center) + center
+#
+#     turn_thread = threading.Thread(target=board.turn, args=[1-board.degree])
 #     # Safeguard
-#     if -30 < degree < 30:
+#     if -30 < 1 < 30:
 #         turn_thread.start()
 #
+#     board.update_angle()
+#
 #     for event in pg.event.get():
-#         if event.type == update:
-#             hardware.update_display(window, font0, font1, font2, angle_region, angle_read, degree, yhat)
+#         if event.type == display.update_event:
+#             display.update(board, 0.0)
