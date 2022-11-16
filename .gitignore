@@ -9,4 +9,5 @@ venv/
 *.npy
 *.txt
 
+models/test
 archive/
