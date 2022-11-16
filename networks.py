@@ -7,6 +7,8 @@ class VSNet(nn.Module):
     def __init__(self):
         super().__init__()
 
+        self.bn = nn.BatchNorm2d(3)
+
         self.dropout = nn.Dropout(p=0.5)
         self.fc1 = nn.Linear(12600, 500)
         self.fc2 = nn.Linear(500, 2*120*101)
@@ -24,6 +26,7 @@ class VSNet(nn.Module):
 
         x = [x0, x1, x2, x3, x4]
         for i in range(5):
+            x[i] = self.bn(x[i])
             x[i] = r.act(r.conv1(x[i]))
             x[i] = r.act(r.conv2(x[i]))
             x[i] = r.act(r.conv2(x[i]))

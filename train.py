@@ -41,9 +41,6 @@ device = torch.device("cuda")
 model = VSNet().to(device)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-
-norm1 = torch.nn.BatchNorm2d(3)
-norm1 = norm1.to(device)
 for epoch in range(10000):
     model.train()
     for step, (x0, x1, x2, x3, x4, y) in enumerate(train_dataloader):
@@ -53,11 +50,6 @@ for epoch in range(10000):
         x3 = x3.to(device)
         x4 = x4.to(device)
         y = y.to(device)
-        x0 = norm1(x0)
-        x1 = norm1(x1)
-        x2 = norm1(x2)
-        x3 = norm1(x3)
-        x4 = norm1(x4)
 
         yh = model(x0, x1, x2, x3, x4)
         train_loss = criterion(yh, y)
@@ -82,11 +74,6 @@ for epoch in range(10000):
             x3 = x3.to(device)
             x4 = x4.to(device)
             y = y.to(device)
-            x0 = norm1(x0)
-            x1 = norm1(x1)
-            x2 = norm1(x2)
-            x3 = norm1(x3)
-            x4 = norm1(x4)
 
             yh = model(x0, x1, x2, x3, x4)
             test_loss = criterion(yh, y)
