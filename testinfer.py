@@ -16,7 +16,7 @@ car.fill((0, 0, 0))
 # Init video displays
 prev_img_num = -1
 session_n = 1
-img_num = 2000
+img_num = 0
 
 # Read from videos
 for i in range(5):
@@ -26,9 +26,8 @@ for i in range(5):
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/vs125.pth", map_location=device))
-norm1 = torch.nn.BatchNorm2d(3)
-norm1 = norm1.to(device)
+model.load_state_dict(torch.load("models/test/vs150.pth", map_location=device))
+model.eval()
 while True:
     # Handle key pressed
     keys = pg.key.get_pressed()
@@ -69,11 +68,6 @@ while True:
         img2 = img2.to(device)
         img3 = img3.to(device)
         img4 = img4.to(device)
-        img0 = norm1(img0)
-        img1 = norm1(img1)
-        img2 = norm1(img2)
-        img3 = norm1(img3)
-        img4 = norm1(img4)
 
         yh = model(img0, img1, img2, img3, img4)
         drivable = yh[:, :12120].reshape(120, 101)
