@@ -66,9 +66,9 @@ prev_img_num = -1
 
 # Labeling progress
 # 0: 10 +20 2610
-# 2: 10 +20 930 2370
-session_n = 0
-img_num = 2610
+# 2: 10 +20 1210 2370
+session_n = 2
+img_num = 1210
 
 # Camera calibrations
 cal = {
