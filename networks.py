@@ -45,6 +45,6 @@ class VSNet(nn.Module):
         x = self.dropout(x)
         x = self.fc2(x)
 
-        # todo normalize outputs
+        # todo maybe normalize outputs -1 to 1
 
         return x
