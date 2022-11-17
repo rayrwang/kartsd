@@ -16,7 +16,7 @@ car.fill((0, 0, 0))
 # Init video displays
 prev_img_num = -1
 session_n = 1
-img_num = 0
+img_num = 2000
 
 # Read from videos
 for i in range(5):
@@ -26,7 +26,7 @@ for i in range(5):
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/test/vs150.pth", map_location=device))
+model.load_state_dict(torch.load("models/test/vs800.pth", map_location=device))
 model.eval()
 while True:
     # Handle key pressed
@@ -84,7 +84,7 @@ while True:
             d = min(255, d)
             pg.draw.rect(px, (d, d, d), (0, 0, 5, 5))
 
-            if e > 0.1:
+            if e > 0.2:
                 e = 255 - e * 255
                 e = max(0, e)
                 e = min(255, e)
