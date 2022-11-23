@@ -33,7 +33,7 @@ dataset = TrainingData()
 train_size = round(0.8*len(dataset))
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = torch.utils.data.random_split(dataset, (train_size, test_size))
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=256, shuffle=True)
 test_dataloader = DataLoader(dataset=test_dataset, batch_size=len(test_dataset))
 
 device = torch.device("cuda")
@@ -41,7 +41,7 @@ device = torch.device("cuda")
 model = VSNet().to(device)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-for epoch in range(10000):
+for epoch in range(100_000):
     model.train()
     for step, (x0, x1, x2, x3, x4, y) in enumerate(train_dataloader):
         x0 = x0.to(device)
