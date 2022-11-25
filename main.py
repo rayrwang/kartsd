@@ -110,7 +110,7 @@ while True:
     pg.display.update()
 
     # Steering control
-    turn_thread = threading.Thread(target=board.turn, args=[1 - board.degree])
+    turn_thread = threading.Thread(target=board.turn, args=[angle - board.degree])
     if -30 < 1 < 30:  # Safeguard
         turn_thread.start()
 
@@ -118,7 +118,7 @@ while True:
     board.update_angle()
     for event in pg.event.get():
         if event.type == display.update_event:
-            display.update(board, 0.0)
+            display.update(board, angle)
 
     if cv2.waitKey(1) == ord("f"):
         cv2.destroyAllWindows()
