@@ -75,7 +75,34 @@ while True:
                 pg.draw.rect(px, (255, e, e), (0, 0, 5, 5))
 
             window.blit(px, (5 * n_x, 595 - (5 * n_y)))
+
+    # Distance to road edge for each angle
+    dist_dict = {}
+    for angle in range(-30, 33, 3):
+        dist_dict[f"{angle}"] = float("inf")
+        for dist in range(60):
+            dist = dist/4 + 0.25
+            x = -dist*math.sin(angle * math.pi / 180)
+            y = dist*math.cos(angle * math.pi / 180)
+            i_x = round(50 + float(x) / 0.25)  # Grid size of 0.25m
+            i_y = round(float(y) / 0.25 + 40)
+            if edge[i_y, i_x] > 0.2 or drivable[i_y, i_x] < 0.2:
+                dist_dict[f"{angle}"] = dist
+                break
+
+    angles = []
+    for i, dist in enumerate((dist_dict.values())):
+        if dist == max(dist_dict.values()):
+            angles.append(-30 + i*3)
+    angle = np.mean(angles)
+    line = pg.Surface((505, 600))
+    line.fill((255, 255, 255))
+    line.set_colorkey((255, 255, 255))
+    pg.draw.line(line, (30, 144, 255), (252.5, 400), (252.5 - 5*4*15*math.sin(angle*math.pi/180),
+                                                   400 - 5*4*15*math.cos(angle*math.pi/180)), width=6)
+    window.blit(line, (0, 0))
     window.blit(car, car.get_rect(center=(252.5, 400 + (1.5/2 - 0.2)/0.25*5)))
+
     pg.display.update()
 
     if cv2.waitKey(1) == ord("f"):
