@@ -59,7 +59,6 @@ while True:
     edge = yh[:, 12120:].reshape(120, 101)
 
     # Display
-    # vs_blur = cv2.GaussianBlur(vs, (9, 9), 0)
     window.fill((255, 255, 255))
     for n_y, (edge_row, drivable_row) in enumerate(zip(edge, drivable)):
         for n_x, (e, d) in enumerate(zip(edge_row, drivable_row)):
