@@ -93,10 +93,9 @@ class Board:
 
 
 class Display:
-    def __init__(self, update_msec):
+    def __init__(self, window, update_msec):
         # Init pygame display
-        self.window = pg.display.set_mode((0, 0))
-        pg.init()
+        self.window = window
         self.clock = pg.time.Clock()
         self.update_event = pg.USEREVENT + 1
         pg.time.set_timer(self.update_event, update_msec)

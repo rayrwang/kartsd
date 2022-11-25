@@ -3,6 +3,7 @@ Main file for inference and control
 """
 
 import math
+import threading
 
 import numpy as np
 import cv2
@@ -10,7 +11,7 @@ import pygame as pg
 import torch
 
 from networks import VSNet
-from hardware import VidCap
+from hardware import VidCap, Board, Display
 
 
 window = pg.display.set_mode((505, 600))
@@ -20,6 +21,9 @@ car.fill((0, 0, 0))
 
 # Read from videos
 cap = VidCap(5, 640, 480)
+
+board = Board("COM3")
+display = Display(window, 500)
 
 device = torch.device("cpu")
 model = VSNet().to(device)
@@ -104,6 +108,17 @@ while True:
     window.blit(car, car.get_rect(center=(252.5, 400 + (1.5/2 - 0.2)/0.25*5)))
 
     pg.display.update()
+
+    # Steering control
+    turn_thread = threading.Thread(target=board.turn, args=[1 - board.degree])
+    if -30 < 1 < 30:  # Safeguard
+        turn_thread.start()
+
+    # Update angle displays
+    board.update_angle()
+    for event in pg.event.get():
+        if event.type == display.update_event:
+            display.update(board, 0.0)
 
     if cv2.waitKey(1) == ord("f"):
         cv2.destroyAllWindows()
