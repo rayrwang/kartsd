@@ -23,13 +23,13 @@ lines.set_colorkey((255, 255, 255))
 #     pg.draw.line(line, (0, 0, 0), (252.5, 400), (252.5 - 5*4*15*math.sin(angle*math.pi/180),
 #                                                                   400 - 5*4*15*math.cos(angle*math.pi/180)))
 #     lines.blit(line, (0, 0))
-for i, angle in enumerate([-30, 30]):
-    line = pg.Surface((505, 600))
-    line.fill((255, 255, 255))
-    line.set_colorkey((255, 255, 255))
-    pg.draw.line(line, (0, 0, 0), (252.5, 400), (252.5 - 5*4*15*math.sin(angle*math.pi/180),
-                                                                  400 - 5*4*15*math.cos(angle*math.pi/180)))
-    lines.blit(line, (0, 0))
+# for i, angle in enumerate([-30, 30]):
+#     line = pg.Surface((505, 600))
+#     line.fill((255, 255, 255))
+#     line.set_colorkey((255, 255, 255))
+#     pg.draw.line(line, (0, 0, 0), (252.5, 400), (252.5 - 5*4*15*math.sin(angle*math.pi/180),
+#                                                                   400 - 5*4*15*math.cos(angle*math.pi/180)))
+#     lines.blit(line, (0, 0))
 
 # Init video displays
 prev_img_num = -1
@@ -92,7 +92,6 @@ while True:
         edge = yh[:, 12120:].reshape(120, 101)
 
     # Display
-    # vs_blur = cv2.GaussianBlur(vs, (9, 9), 0)
     window.fill((255, 255, 255))
     for n_y, (edge_row, drivable_row) in enumerate(zip(edge, drivable)):
         for n_x, (e, d) in enumerate(zip(edge_row, drivable_row)):
@@ -109,8 +108,7 @@ while True:
                 pg.draw.rect(px, (255, e, e), (0, 0, 5, 5))
 
             window.blit(px, (5 * n_x, 595 - (5 * n_y)))
-    window.blit(car, car.get_rect(center=(252.5, 400 + (1.5/2 - 0.2)/0.25*5)))
-    window.blit(lines, (0, 0))
+    # window.blit(lines, (0, 0))
 
     # Distance to road edge for each angle
     dist_dict = {}
@@ -122,7 +120,7 @@ while True:
             y = dist*math.cos(angle * math.pi / 180)
             i_x = round(50 + float(x) / 0.25)  # Grid size of 0.25m
             i_y = round(float(y) / 0.25 + 40)
-            if edge[i_y, i_x] > 0.2:
+            if edge[i_y, i_x] > 0.2 or drivable[i_y, i_x] < 0.2:
                 dist_dict[f"{angle}"] = dist
                 break
 
@@ -131,14 +129,15 @@ while True:
         if dist == max(dist_dict.values()):
             angles.append(-30 + i*3)
     angle = np.mean(angles)
-    print(dist_dict)
-    print(angle)
+    # print(dist_dict)
+    # print(angle)
     line = pg.Surface((505, 600))
     line.fill((255, 255, 255))
     line.set_colorkey((255, 255, 255))
     pg.draw.line(line, (30, 144, 255), (252.5, 400), (252.5 - 5*4*15*math.sin(angle*math.pi/180),
-                                                   400 - 5*4*15*math.cos(angle*math.pi/180)), width=5)
+                                                   400 - 5*4*15*math.cos(angle*math.pi/180)), width=6)
     window.blit(line, (0, 0))
+    window.blit(car, car.get_rect(center=(252.5, 400 + (1.5/2 - 0.2)/0.25*5)))
 
     pg.display.update()
     if cv2.waitKey(1) == ord("f"):
