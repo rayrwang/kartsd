@@ -13,10 +13,28 @@ pg.init()
 car = pg.Surface((0.9/0.25*5, 1.5/0.25*5))
 car.fill((0, 0, 0))
 
+lines = pg.Surface((505, 600))
+lines.fill((255, 255, 255))
+lines.set_colorkey((255, 255, 255))
+# for i, angle in enumerate(range(-30, 33, 3)):
+#     line = pg.Surface((505, 600))
+#     line.fill((255, 255, 255))
+#     line.set_colorkey((255, 255, 255))
+#     pg.draw.line(line, (0, 0, 0), (252.5, 400), (252.5 - 5*4*15*math.sin(angle*math.pi/180),
+#                                                                   400 - 5*4*15*math.cos(angle*math.pi/180)))
+#     lines.blit(line, (0, 0))
+for i, angle in enumerate([-30, 30]):
+    line = pg.Surface((505, 600))
+    line.fill((255, 255, 255))
+    line.set_colorkey((255, 255, 255))
+    pg.draw.line(line, (0, 0, 0), (252.5, 400), (252.5 - 5*4*15*math.sin(angle*math.pi/180),
+                                                                  400 - 5*4*15*math.cos(angle*math.pi/180)))
+    lines.blit(line, (0, 0))
+
 # Init video displays
 prev_img_num = -1
 session_n = 1
-img_num = 2000
+img_num = 0
 
 # Read from videos
 for i in range(5):
@@ -26,15 +44,15 @@ for i in range(5):
 
 device = torch.device("cpu")
 model = VSNet().to(device)
-model.load_state_dict(torch.load("models/test/vs800.pth", map_location=device))
+model.load_state_dict(torch.load("models/test/vs1700.pth", map_location=device))
 model.eval()
 while True:
     # Handle key pressed
     keys = pg.key.get_pressed()
     if keys[pg.K_d]:
-        img_num += 20
+        img_num += 10
     elif keys[pg.K_a]:
-        img_num -= 20
+        img_num -= 10
     elif keys[pg.K_f]:
         edge_img_changed = True
 
@@ -92,8 +110,37 @@ while True:
 
             window.blit(px, (5 * n_x, 595 - (5 * n_y)))
     window.blit(car, car.get_rect(center=(252.5, 400 + (1.5/2 - 0.2)/0.25*5)))
-    pg.display.update()
+    window.blit(lines, (0, 0))
 
+    # Distance to road edge for each angle
+    dist_dict = {}
+    for angle in range(-30, 33, 3):
+        dist_dict[f"{angle}"] = float("inf")
+        for dist in range(60):
+            dist = dist/4 + 0.25
+            x = -dist*math.sin(angle * math.pi / 180)
+            y = dist*math.cos(angle * math.pi / 180)
+            i_x = round(50 + float(x) / 0.25)  # Grid size of 0.25m
+            i_y = round(float(y) / 0.25 + 40)
+            if edge[i_y, i_x] > 0.2:
+                dist_dict[f"{angle}"] = dist
+                break
+
+    angles = []
+    for i, dist in enumerate((dist_dict.values())):
+        if dist == max(dist_dict.values()):
+            angles.append(-30 + i*3)
+    angle = np.mean(angles)
+    print(dist_dict)
+    print(angle)
+    line = pg.Surface((505, 600))
+    line.fill((255, 255, 255))
+    line.set_colorkey((255, 255, 255))
+    pg.draw.line(line, (30, 144, 255), (252.5, 400), (252.5 - 5*4*15*math.sin(angle*math.pi/180),
+                                                   400 - 5*4*15*math.cos(angle*math.pi/180)), width=5)
+    window.blit(line, (0, 0))
+
+    pg.display.update()
     if cv2.waitKey(1) == ord("f"):
         cv2.destroyAllWindows()
         cv2.VideoCapture(0).release()
