@@ -3,6 +3,7 @@ For interacting with hardware (cameras, Arduino ports, display)
 """
 
 import math
+import time
 
 import pyfirmata as pf
 import pygame as pg
@@ -63,59 +64,62 @@ class Board:
         self.last = 0.5
         self.degree = 0
 
+        self.turn_deg = 0
+
     def update_angle(self):
-        self.last = self.angle_read
-        self.angle_read = self.board.analog[0].read()
+        while True:
+            time.sleep(0.01)  # Bare loops seem to mess with program flow (?)
+            self.last = self.angle_read
+            self.angle_read = self.board.analog[0].read()
 
-        # Handle crossing angle region boundary
-        if self.angle_read > 0.80 and self.last < 0.20:
-            self.angle_region -= 1
-        if self.angle_read < 0.20 and self.last > 0.80:
-            self.angle_region += 1
+            # Handle crossing angle region boundary
+            if self.angle_read > 0.80 and self.last < 0.20:
+                self.angle_region -= 1
+            if self.angle_read < 0.20 and self.last > 0.80:
+                self.angle_region += 1
 
-        if self.angle_region == 0:
-            self.degree = -1 / 7 * (0.04 - (0.96 - self.angle_read) - 0.5) * 360 / 0.92
-        elif self.angle_region == 1:
-            self.degree = -1 / 7 * (self.angle_read - 0.5) * 360 / 0.92
-        elif self.angle_region == 2:
-            self.degree = -1 / 7 * (0.96 + (self.angle_read - 0.04) - 0.5) * 360 / 0.92
+            if self.angle_region == 0:
+                self.degree = -1 / 7 * (0.04 - (0.96 - self.angle_read) - 0.5) * 360 / 0.92
+            elif self.angle_region == 1:
+                self.degree = -1 / 7 * (self.angle_read - 0.5) * 360 / 0.92
+            elif self.angle_region == 2:
+                self.degree = -1 / 7 * (0.96 + (self.angle_read - 0.04) - 0.5) * 360 / 0.92
 
-    def turn(self, deg):
+    def turn(self):
         """turn steering ccw (dir=True), cw"""
-        if deg > 0:
-            self.board.digital[4].write(1)
-        else:
-            self.board.digital[4].write(0)
+        while True:
+            deg = self.turn_deg - self.degree
+            if math.fabs(deg) > 0.5:
+                if deg > 0:
+                    self.board.digital[4].write(1)
+                else:
+                    self.board.digital[4].write(0)
 
-        for i in range(min(1, round(math.fabs(deg * 4)))):
-            self.board.digital[2].write(0)
-            self.board.digital[2].write(1)
+                self.board.digital[2].write(0)
+                self.board.digital[2].write(1)
+            else:
+                time.sleep(0.01)  # Else deg display won't update idk why
 
 
 class Display:
-    def __init__(self, window, update_msec):
+    def __init__(self, window):
         # Init pygame display
         self.window = window
-        self.clock = pg.time.Clock()
-        self.update_event = pg.USEREVENT + 1
-        pg.time.set_timer(self.update_event, update_msec)
 
         # Init fonts
-        self.font0 = pg.font.Font("Helvetica.ttf", 100)
-        self.font1 = pg.font.Font("Helvetica.ttf", 75)
+        self.font0 = pg.font.Font("Helvetica.ttf", 75)
+        self.font1 = pg.font.Font("Helvetica.ttf", 50)
         self.font2 = pg.font.Font("Helvetica.ttf", 25)
 
     def update(self, board, pred):
         # Display update
-        self.window.fill((255, 255, 255))
-
         region_txt = self.font2.render(f"{board.angle_region}", False, (0, 0, 0))
         self.window.blit(region_txt, (0, 0))
 
         angle_read_txt = self.font2.render(f"{board.angle_read}", False, (0, 0, 0))
         self.window.blit(angle_read_txt, (0, 50))
 
-        pred_txt = self.font2.render(f"{pred : .4f}", False, (0, 0, 0))
+        pred_txt = self.font2.render(f"{pred : .2f}", False, (0, 0, 0))
         self.window.blit(pred_txt, (0, 100))
 
         degree_txt = self.font0.render(f"{math.fabs(board.degree) : .2f}", False, (0, 0, 0))
@@ -127,11 +131,11 @@ class Display:
 
         # Display text
         degree_rect = degree_txt.get_rect()
-        degree_rect.center = (300, 512)
+        degree_rect.center = (252.5, 100)
         self.window.blit(degree_txt, degree_rect)
 
         dir_rect = dir_txt.get_rect()
-        dir_rect.center = (300, 400)
+        dir_rect.center = (252.5, 40)
         self.window.blit(dir_txt, dir_rect)
 
         pg.display.update()

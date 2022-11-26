@@ -4,6 +4,7 @@ Main file for inference and control
 
 import math
 import threading
+import time
 
 import numpy as np
 import cv2
@@ -23,12 +24,20 @@ car.fill((0, 0, 0))
 cap = VidCap(5, 640, 480)
 
 board = Board("COM3")
-display = Display(window, 500)
+display = Display(window)
+
+time.sleep(1)
+sensor_thread = threading.Thread(target=board.update_angle)
+sensor_thread.start()
+turn_thread = threading.Thread(target=board.turn)
+turn_thread.start()
 
 device = torch.device("cpu")
 model = VSNet().to(device)
 model.load_state_dict(torch.load("models/vs.pth", map_location=device))
 model.eval()
+
+gain = 1
 while True:
     # Get new image
     cap.read()
@@ -71,7 +80,6 @@ while True:
             d = max(0, d)
             d = min(255, d)
             pg.draw.rect(px, (d, d, d), (0, 0, 5, 5))
-
             if e > 0.2:
                 e = 255 - e * 255
                 e = max(0, e)
@@ -109,16 +117,14 @@ while True:
 
     pg.display.update()
 
-    # Steering control
-    turn_thread = threading.Thread(target=board.turn, args=[angle - board.degree])
-    if -30 < 1 < 30:  # Safeguard
-        turn_thread.start()
+    angle = max(min(gain * angle, 20), -20)  # Scale and clip angle
+
+    # Turn
+    if -30 < angle < 30:  # Safeguard
+        board.turn_deg = angle
 
     # Update angle displays
-    board.update_angle()
-    for event in pg.event.get():
-        if event.type == display.update_event:
-            display.update(board, angle)
+    display.update(board, angle)
 
     if cv2.waitKey(1) == ord("f"):
         cv2.destroyAllWindows()
@@ -133,7 +139,7 @@ while True:
 # import torch
 #
 # from hardware import VidCap, Board, Display
-# from networks import SteerNet, VSNet
+# # from networks import SteerNet, VSNet
 #
 # # model = SteerNet()
 # # device = torch.device("cpu")
@@ -144,7 +150,7 @@ while True:
 # gain = 1
 #
 # board = Board("COM3")
-# display = Display(500)
+# # display = Display(500)
 # while True:
 #
 #
