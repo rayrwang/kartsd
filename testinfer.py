@@ -112,7 +112,7 @@ while True:
 
     # Distance to road edge for each angle
     dist_dict = {}
-    for angle in range(-30, 33, 3):
+    for angle in range(-30, 33, 1):
         dist_dict[f"{angle}"] = float("inf")
         for dist in range(60):
             dist = dist/4 + 0.25
@@ -127,7 +127,7 @@ while True:
     angles = []
     for i, dist in enumerate((dist_dict.values())):
         if dist == max(dist_dict.values()):
-            angles.append(-30 + i*3)
+            angles.append(-30 + i)
     angle = np.mean(angles)
     # print(dist_dict)
     # print(angle)
@@ -140,6 +140,7 @@ while True:
     window.blit(car, car.get_rect(center=(252.5, 400 + (1.5/2 - 0.2)/0.25*5)))
 
     pg.display.update()
+
     if cv2.waitKey(1) == ord("f"):
         cv2.destroyAllWindows()
         cv2.VideoCapture(0).release()
