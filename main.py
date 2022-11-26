@@ -90,7 +90,7 @@ while True:
 
     # Distance to road edge for each angle
     dist_dict = {}
-    for angle in range(-30, 33, 3):
+    for angle in range(-30, 33, 1):
         dist_dict[f"{angle}"] = float("inf")
         for dist in range(60):
             dist = dist/4 + 0.25
@@ -105,7 +105,7 @@ while True:
     angles = []
     for i, dist in enumerate((dist_dict.values())):
         if dist == max(dist_dict.values()):
-            angles.append(-30 + i*3)
+            angles.append(-30 + i)
     angle = np.mean(angles)
     line = pg.Surface((505, 600))
     line.fill((255, 255, 255))
