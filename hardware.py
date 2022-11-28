@@ -131,11 +131,11 @@ class Display:
 
         # Display text
         degree_rect = degree_txt.get_rect()
-        degree_rect.center = (252.5, 100)
+        degree_rect.center = (252.5, 560)
         self.window.blit(degree_txt, degree_rect)
 
         dir_rect = dir_txt.get_rect()
-        dir_rect.center = (252.5, 40)
+        dir_rect.center = (252.5, 500)
         self.window.blit(dir_txt, dir_rect)
 
         pg.display.update()
