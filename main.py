@@ -37,20 +37,19 @@ model = VSNet().to(device)
 model.load_state_dict(torch.load("models/vs.pth", map_location=device))
 model.eval()
 
-gain = 1
+gain = 0.5
+bias = -5
 while True:
     # Get new image
     cap.read()
-    for i in range(5):
-        globals()[f"img{i}"] = getattr(cap, f"img{i}")
     cap.imshow()
 
     # Inference
-    img0 = torch.from_numpy(img0[None, :].astype("float32"))
-    img1 = torch.from_numpy(img1[None, :].astype("float32"))
-    img2 = torch.from_numpy(img2[None, :].astype("float32"))
-    img3 = torch.from_numpy(img3[None, :].astype("float32"))
-    img4 = torch.from_numpy(img4[None, :].astype("float32"))
+    img0 = torch.from_numpy(cap.img0[None, :].astype("float32"))
+    img1 = torch.from_numpy(cap.img1[None, :].astype("float32"))
+    img2 = torch.from_numpy(cap.img2[None, :].astype("float32"))
+    img3 = torch.from_numpy(cap.img3[None, :].astype("float32"))
+    img4 = torch.from_numpy(cap.img4[None, :].astype("float32"))
     img0 = torch.swapaxes(img0, 1, 3)
     img1 = torch.swapaxes(img1, 1, 3)
     img2 = torch.swapaxes(img2, 1, 3)
@@ -72,27 +71,28 @@ while True:
     edge = yh[:, 12120:].reshape(120, 101)
 
     # Display
-    window.fill((255, 255, 255))
+    window.fill((210, 210, 210))
+    px = pg.Surface((5, 5))
     for n_y, (edge_row, drivable_row) in enumerate(zip(edge, drivable)):
         for n_x, (e, d) in enumerate(zip(edge_row, drivable_row)):
-            px = pg.Surface((5, 5))
-            d = 210 + 45 * d
-            d = max(0, d)
-            d = min(255, d)
-            pg.draw.rect(px, (d, d, d), (0, 0, 5, 5))
+            if d > 0.4:
+                d = 210 + 45 * d
+                d = max(0, d)
+                d = min(255, d)
+                pg.draw.rect(px, (d, d, d), (0, 0, 5, 5))
+                window.blit(px, (5 * n_x, 595 - (5 * n_y)))
             if e > 0.2:
                 e = 255 - e * 255
                 e = max(0, e)
                 e = min(255, e)
                 pg.draw.rect(px, (255, e, e), (0, 0, 5, 5))
-
-            window.blit(px, (5 * n_x, 595 - (5 * n_y)))
+                window.blit(px, (5 * n_x, 595 - (5 * n_y)))
 
     # Distance to road edge for each angle
     dist_dict = {}
     for angle in range(-30, 33, 1):
         dist_dict[f"{angle}"] = float("inf")
-        for dist in range(60):
+        for dist in range(20):
             dist = dist/4 + 0.25
             x = -dist*math.sin(angle * math.pi / 180)
             y = dist*math.cos(angle * math.pi / 180)
@@ -110,14 +110,12 @@ while True:
     line = pg.Surface((505, 600))
     line.fill((255, 255, 255))
     line.set_colorkey((255, 255, 255))
-    pg.draw.line(line, (30, 144, 255), (252.5, 400), (252.5 - 5*4*15*math.sin(angle*math.pi/180),
-                                                   400 - 5*4*15*math.cos(angle*math.pi/180)), width=6)
+    pg.draw.line(line, (30, 144, 255), (252.5, 400), (252.5 - 5*4*5*math.sin(angle*math.pi/180),
+                                                   400 - 5*4*5*math.cos(angle*math.pi/180)), width=6)
     window.blit(line, (0, 0))
     window.blit(car, car.get_rect(center=(252.5, 400 + (1.5/2 - 0.2)/0.25*5)))
 
-    pg.display.update()
-
-    angle = max(min(gain * angle, 20), -20)  # Scale and clip angle
+    angle = max(min(gain * angle + bias, 20), -20)  # Scale and clip angle
 
     # Turn
     if -30 < angle < 30:  # Safeguard
@@ -130,49 +128,3 @@ while True:
         cv2.destroyAllWindows()
         cv2.VideoCapture(0).release()
         break
-
-
-# import threading
-#
-# import pygame as pg
-# import cv2
-# import torch
-#
-# from hardware import VidCap, Board, Display
-# # from networks import SteerNet, VSNet
-#
-# # model = SteerNet()
-# # device = torch.device("cpu")
-# # model.load_state_dict(torch.load("models/light_sides.pth", map_location=device))
-# # model.eval()
-#
-# center = -1.5
-# gain = 1
-#
-# board = Board("COM3")
-# # display = Display(500)
-# while True:
-#
-#
-#     # if cv2.waitKey(1) == ord("f"):
-#     #     cv2.destroyAllWindows()
-#     #     cv2.VideoCapture(0).release()
-#     #     break
-#
-#     # img0 = img0.astype("float32")
-#     # x = torch.from_numpy(img0[None, :])
-#     # x = torch.swapaxes(x, 1, 3)
-#     # x = torch.swapaxes(x, 2, 3)
-#     # x = x.to(device)
-#     # yhat = gain*(model(x).item() - center) + center
-#
-#     turn_thread = threading.Thread(target=board.turn, args=[1-board.degree])
-#     # Safeguard
-#     if -30 < 1 < 30:
-#         turn_thread.start()
-#
-#     board.update_angle()
-#
-#     for event in pg.event.get():
-#         if event.type == display.update_event:
-#             display.update(board, 0.0)
