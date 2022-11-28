@@ -90,7 +90,7 @@ while True:
 
     # Distance to road edge for each angle
     dist_dict = {}
-    for angle in range(-30, 33, 1):
+    for angle in range(-30, 31, 1):
         dist_dict[f"{angle}"] = float("inf")
         for dist in range(20):
             dist = dist/4 + 0.25
