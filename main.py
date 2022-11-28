@@ -37,8 +37,12 @@ model = VSNet().to(device)
 model.load_state_dict(torch.load("models/vs.pth", map_location=device))
 model.eval()
 
-gain = 0.5
-bias = -5
+gain = 0.4
+bias = -3
+
+edge_supress = np.vectorize(lambda x: 0.0 if x < 0.2 else x)
+px = pg.Surface((5, 5))
+px.set_colorkey((255, 255, 255))
 while True:
     # Get new image
     cap.read()
@@ -69,24 +73,16 @@ while True:
     yh = model(img0, img1, img2, img3, img4)
     drivable = yh[:, :12120].reshape(120, 101)
     edge = yh[:, 12120:].reshape(120, 101)
-
+    drivable_display = torch.minimum(torch.Tensor([255]), torch.maximum(torch.Tensor([0]), 210 + 45 * drivable))
+    edge_display = torch.minimum(torch.Tensor([255]), torch.maximum(torch.Tensor([0]), 255 - 255*torch.from_numpy(edge_supress(edge.detach().numpy()))))
     # Display
     window.fill((210, 210, 210))
-    px = pg.Surface((5, 5))
-    for n_y, (edge_row, drivable_row) in enumerate(zip(edge, drivable)):
-        for n_x, (e, d) in enumerate(zip(edge_row, drivable_row)):
-            if d > 0.4:
-                d = 210 + 45 * d
-                d = max(0, d)
-                d = min(255, d)
-                pg.draw.rect(px, (d, d, d), (0, 0, 5, 5))
-                window.blit(px, (5 * n_x, 595 - (5 * n_y)))
-            if e > 0.2:
-                e = 255 - e * 255
-                e = max(0, e)
-                e = min(255, e)
-                pg.draw.rect(px, (255, e, e), (0, 0, 5, 5))
-                window.blit(px, (5 * n_x, 595 - (5 * n_y)))
+    for n_y, (drivable_row, edge_row) in enumerate(zip(drivable_display, edge_display)):
+        for n_x, (d, e) in enumerate(zip(drivable_row, edge_row)):
+            pg.draw.rect(px, (d, d, d), (0, 0, 5, 5))
+            window.blit(px, (5 * n_x, 595 - (5 * n_y)))
+            pg.draw.rect(px, (255, e, e), (0, 0, 5, 5))
+            window.blit(px, (5 * n_x, 595 - (5 * n_y)))
 
     # Distance to road edge for each angle
     dist_dict = {}
