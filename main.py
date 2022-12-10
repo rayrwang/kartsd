@@ -37,12 +37,12 @@ model = VSNet().to(device)
 model.load_state_dict(torch.load("models/vs.pth", map_location=device))
 model.eval()
 
-gain = 0.4
-bias = -3
-
 edge_supress = np.vectorize(lambda x: 0.0 if x < 0.2 else x)
 px = pg.Surface((5, 5))
 px.set_colorkey((255, 255, 255))
+
+kp = 0.4
+bias = -3
 while True:
     # Get new image
     cap.read()
@@ -111,14 +111,14 @@ while True:
     window.blit(line, (0, 0))
     window.blit(car, car.get_rect(center=(252.5, 400 + (1.5/2 - 0.2)/0.25*5)))
 
-    angle = max(min(gain * angle + bias, 20), -20)  # Scale and clip angle
+    steer_angle = max(min(kp*angle + bias, 20), -20)  # Scale and clip angle
 
     # Turn
-    if -30 < angle < 30:  # Safeguard
-        board.turn_deg = angle
+    if -30 < steer_angle < 30:  # Safeguard
+        board.turn_deg = steer_angle
 
     # Update angle displays
-    display.update(board, angle)
+    display.update(board, steer_angle)
 
     if cv2.waitKey(1) == ord("f"):
         cv2.destroyAllWindows()
