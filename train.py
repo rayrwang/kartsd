@@ -33,8 +33,8 @@ dataset = TrainingData()
 train_size = round(0.8*len(dataset))
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = torch.utils.data.random_split(dataset, (train_size, test_size))
-train_dataloader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
-test_dataloader = DataLoader(dataset=test_dataset, batch_size=len(test_dataset))
+train_dataloader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True, pin_memory=True)
+test_dataloader = DataLoader(dataset=test_dataset, batch_size=len(test_dataset), pin_memory=True)
 
 device = torch.device("cuda")
 
