@@ -114,8 +114,7 @@ while True:
     steer_angle = max(min(kp*angle + bias, 20), -20)  # Scale and clip angle
 
     # Turn
-    if -30 < steer_angle < 30:  # Safeguard
-        board.turn_deg = steer_angle
+    board.turn_deg = steer_angle
 
     # Update angle displays
     display.update(board, steer_angle)
