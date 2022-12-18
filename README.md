@@ -2,6 +2,6 @@
 
 ### Hardware:
 
-- 3 cameras
+- 5 cameras
 - stepper motor
 - angle sensor
