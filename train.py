@@ -58,20 +58,21 @@ for epoch in range(100_000):
         train_loss.backward()
         optimizer.step()
 
-    with torch.no_grad():
-        model.eval()
-        for step, (x0, x1, x2, x3, x4, y) in enumerate(test_dataloader):
-            x0 = x0.to(device)
-            x1 = x1.to(device)
-            x2 = x2.to(device)
-            x3 = x3.to(device)
-            x4 = x4.to(device)
-            y = y.to(device)
+    if (epoch + 1) % 25 == 0:
+        with torch.no_grad():
+            model.eval()
+            for step, (x0, x1, x2, x3, x4, y) in enumerate(test_dataloader):
+                x0 = x0.to(device)
+                x1 = x1.to(device)
+                x2 = x2.to(device)
+                x3 = x3.to(device)
+                x4 = x4.to(device)
+                y = y.to(device)
 
-            yh = model(x0, x1, x2, x3, x4)
-            test_loss = criterion(yh, y)
+                yh = model(x0, x1, x2, x3, x4)
+                test_loss = criterion(yh, y)
 
-        print(f"Epoch {epoch + 1}, Test loss:{test_loss.item() : .4f}")
+            print(f"Epoch {epoch + 1}, Test loss:{test_loss.item() : .4f}")
 
     if (epoch + 1) % 25 == 0:
         torch.save(model.state_dict(), f"models/test/vs{epoch + 1}.pth")
