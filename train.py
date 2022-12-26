@@ -76,3 +76,5 @@ for epoch in range(100_000):
 
     if (epoch + 1) % 25 == 0:
         torch.save(model.state_dict(), f"models/test/vs{epoch + 1}.pth")
+
+    print(f"Epoch {epoch+1}")
