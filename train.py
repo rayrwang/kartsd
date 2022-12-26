@@ -58,13 +58,6 @@ for epoch in range(100_000):
         train_loss.backward()
         optimizer.step()
 
-        try:
-            print(f"Epoch {epoch + 1}, Step {step + 1}, "
-                  f"Train loss:{train_loss.item() : .4f}, Test loss:{test_loss.item() : .4f}")
-        except NameError:
-            print(f"Epoch {epoch + 1}, Step {step + 1}, "
-                  f"Train loss:{train_loss.item() : .4f}, Test loss: Not defined yet")
-
     with torch.no_grad():
         model.eval()
         for step, (x0, x1, x2, x3, x4, y) in enumerate(test_dataloader):
@@ -77,6 +70,8 @@ for epoch in range(100_000):
 
             yh = model(x0, x1, x2, x3, x4)
             test_loss = criterion(yh, y)
+
+        print(f"Epoch {epoch + 1}, Test loss:{test_loss.item() : .4f}")
 
     if (epoch + 1) % 25 == 0:
         torch.save(model.state_dict(), f"models/test/vs{epoch + 1}.pth")
