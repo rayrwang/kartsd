@@ -1,4 +1,4 @@
-# kartsd
+# kartsd: go-KART (Self Driving)
 
 ### Demo:
 https://www.youtube.com/watch?v=IufEBQQmdNg
