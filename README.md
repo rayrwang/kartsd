@@ -1,6 +1,6 @@
 # kartsd: Go-<ins>Kart</ins> (<ins>S</ins>elf <ins>D</ins>riving)
 
-### Demo:
+### Demo video:
 https://www.youtube.com/watch?v=IufEBQQmdNg
 
 ### Documentation:
